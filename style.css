@@ -1,0 +1,61 @@
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #141e30, #243b55);
+    color: white;
+    text-align: center;
+    margin: 0;
+}
+
+.container {
+    padding: 20px;
+    max-width: 420px;
+    margin: auto;
+}
+
+#timer {
+    font-size: 22px;
+    color: #00ffcc;
+    margin: 10px 0;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    background: #0d6efd;
+    color: white;
+}
+
+button:disabled {
+    opacity: 0.6;
+}
+
+#result,
+#finalResult {
+    margin-top: 15px;
+    font-size: 22px;
+    padding: 15px;
+    border-radius: 10px;
+}
+
+.spy {
+    background: #ff0033;
+}
+
+.normal {
+    background: #198754;
+}
+
+#nextBtn,
+#voting,
+#restartBtn {
+    display: none;
+}
+
+#voting button {
+    background: #ffc107;
+    color: black;
+}

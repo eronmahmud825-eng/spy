@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ku">
+
+<head>
+    <meta charset="UTF-8">
+    <title>🕵️ یاری جاسوس</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>🕵️ یاری جاسوس</h1>
+
+        <div id="timer">⏱️ 03:00</div>
+
+        <p id="playerText">یاریزانی 1 کرتە بکە</p>
+
+        <button id="showBtn" onclick="showRole()">نیشاندانی ڕۆڵ</button>
+
+        <div id="result"></div>
+
+        <button id="nextBtn" onclick="nextPlayer()">یاریزانی داهاتوو</button>
+
+        <!-- Voting -->
+        <div id="voting">
+            <h3>🗳️ جاسوس کێیە؟</h3>
+            <button onclick="vote(1)">یاریزانی 1</button>
+            <button onclick="vote(2)">یاریزانی 2</button>
+            <button onclick="vote(3)">یاریزانی 3</button>
+        </div>
+
+        <div id="finalResult"></div>
+
+        <button id="restartBtn" onclick="restartGame()">🔁 دووبارە یاری</button>
+    </div>
+
+    <audio id="spySound">
+  <source src="https://www.soundjay.com/button/sounds/button-10.mp3">
+</audio>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
