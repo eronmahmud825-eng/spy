@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🕵️ یاری جاسوس</title>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -10,34 +11,38 @@
 <body>
 
     <div class="container">
-        <h1>🕵️ یاری جاسوس</h1>
 
-        <div id="timer">⏱️ 03:00</div>
+        <div id="setup">
+            <h1>🕵️ یاری جاسوس</h1>
 
-        <p id="playerText">یاریزانی 1 کرتە بکە</p>
+            <label>👥 ژمارەی پلەیەر (٣–١٦)</label>
+            <input id="players" type="number" min="3" max="16" value="5">
 
-        <button id="showBtn" onclick="showRole()">نیشاندانی ڕۆڵ</button>
+            <label>🕵️ ژمارەی جاسوس (١–٥)</label>
+            <input id="spies" type="number" min="1" max="5" value="1">
 
-        <div id="result"></div>
+            <label>⏱️ کات (٣–٢٠ خولەک)</label>
+            <input id="minutes" type="number" min="3" max="20" value="5">
 
-        <button id="nextBtn" onclick="nextPlayer()">یاریزانی داهاتوو</button>
-
-        <!-- Voting -->
-        <div id="voting">
-            <h3>🗳️ جاسوس کێیە؟</h3>
-            <button onclick="vote(1)">یاریزانی 1</button>
-            <button onclick="vote(2)">یاریزانی 2</button>
-            <button onclick="vote(3)">یاریزانی 3</button>
+            <button onclick="startGame()">🚀 دەستپێکردن</button>
         </div>
 
-        <div id="finalResult"></div>
+        <div id="game">
+            <div id="timer"></div>
+            <p id="playerText"></p>
 
-        <button id="restartBtn" onclick="restartGame()">🔁 دووبارە یاری</button>
+            <button id="showBtn" onclick="showRole()">نیشاندانی ڕۆڵ</button>
+            <div id="result"></div>
+
+            <button id="nextBtn" onclick="nextPlayer()">پلەیەری داهاتوو</button>
+
+            <div id="voting"></div>
+            <div id="finalResult"></div>
+
+            <button id="restartBtn" onclick="restartGame()">🔁 یاری نوێ</button>
+        </div>
+
     </div>
-
-    <audio id="spySound">
-  <source src="https://www.soundjay.com/button/sounds/button-10.mp3">
-</audio>
 
     <script src="script.js"></script>
 </body>
