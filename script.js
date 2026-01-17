@@ -1,102 +1,148 @@
+// DOM
+const setup = document.getElementById("setup");
+const game = document.getElementById("game");
+const playersInput = document.getElementById("players");
+const spiesInput = document.getElementById("spies");
+const minutesInput = document.getElementById("minutes");
+
+const timerEl = document.getElementById("timer");
+const playerText = document.getElementById("playerText");
+const showBtn = document.getElementById("showBtn");
+const result = document.getElementById("result");
+const nextBtn = document.getElementById("nextBtn");
+const voting = document.getElementById("voting");
+const finalResult = document.getElementById("finalResult");
+const restartBtn = document.getElementById("restartBtn");
+
+// WORD GROUPS
 const words = [
-    "خانوو", "کتێب", "جانتا", "قوڕڕ", "زۆپا", "هاوین", "زستان", "کەباب",
-    "سەیارە", "سلێمانی", "ئەمەریکا", "کارەبا", "جادە", "زانکۆ",
-    "ڕێستۆرانت", "فەیسبووک", "یوتوب", "تیکتۆک", "شێر", "سەگ",
-    "پشیلە", "باران", "خۆر", "مانگ", "zanko", "KER", "QN", "tramp", "jo baidn", "nergala", "sisam", "kursi", "sayara", "compitar", "mobail", "snapchat", "shuti", "virus", "banj"
+    { category: "شار/ووڵات", hint2: "ن", items: ["سلێمانی", "هەولێر", "دهۆک", "کرکوک", "کووردستان", "کەنەدا", "ئەمەریکا", "نیۆڕک"] },
+    { category: "خواردن", hint2: "", items: ["کەباب", "پیتزا", "بەریانی", "دۆنەر", "ماسی", "برنج", "یاپراخ", "شفتە", "کفتە", "دۆنەر", "مریشک", "گۆشت", "ئیندۆمی", "سووپ"] },
+    { category: " سۆشیال میدیا", hint2: "پلاتفۆرمی ڤیدیۆ", items: ["یوتوب", "تیکتۆک", "فەیسبووک", "ئینستاگرام", "ئێکس", "تویچ", "مەسنجەر", "سێرد"] },
+    { category: "ئاژەڵ", hint2: "", items: ["سەگ", "پشیلە", "مانگا", "دووپشک", "مار", "گوورگ", "شێر", "بزن", "کەر", "مەیموون", "ووشتر", "کۆتر", "مریشک", "قەل"] }
+
+
 ];
 
-const totalPlayers = 3;
+// GAME STATE
+let totalPlayers, spyCount, time;
 let currentPlayer = 1;
-let spyIndex = Math.floor(Math.random() * totalPlayers) + 1;
-let secretWord = words[Math.floor(Math.random() * words.length)];
+let spies = [];
+let secret;
+let timerInterval;
+let hint2Shown = false;
 
-let time = 180;
-let timerInterval = null;
-let timerStarted = false;
-let votingDone = false;
+// START
+function startGame() {
+    totalPlayers = +playersInput.value;
+    spyCount = +spiesInput.value;
+    time = +minutesInput.value * 60;
 
-function updateTimerUI() {
-    let min = String(Math.floor(time / 60)).padStart(2, '0');
-    let sec = String(time % 60).padStart(2, '0');
-    document.getElementById("timer").innerText = `⏱️ ${min}:${sec}`;
+    spies = [];
+    while (spies.length < spyCount) {
+        let r = Math.floor(Math.random() * totalPlayers) + 1;
+        if (!spies.includes(r)) spies.push(r);
+    }
+
+    const group = words[Math.floor(Math.random() * words.length)];
+    const word = group.items[Math.floor(Math.random() * group.items.length)];
+    secret = { word: word, category: group.category, hint2: group.hint2 };
+
+    setup.style.display = "none";
+    game.style.display = "block";
+    updateTimer();
+    playerText.innerText = "پلەیەری 1 کرتە بکە";
+}
+
+// TIMER
+function updateTimer() {
+    let m = String(Math.floor(time / 60)).padStart(2, "0");
+    let s = String(time % 60).padStart(2, "0");
+    timerEl.innerText = `⏱️ ${m}:${s}`;
 }
 
 function startTimer() {
-    if (timerStarted) return; // 🔒 prevent double start
-    timerStarted = true;
-
     timerInterval = setInterval(() => {
         time--;
-        updateTimerUI();
+        updateTimer();
+
+        // SECOND HINT AT HALF TIME
+        if (!hint2Shown && time <= (minutesInput.value * 60) / 2) {
+            hint2Shown = true;
+            alert("💡 هینتی دووەم: " + secret.hint2);
+        }
 
         if (time <= 0) {
             clearInterval(timerInterval);
-            document.getElementById("voting").style.display = "block";
-            alert("⏰ کات تەواو بوو! دەنگدان بکەن.");
+            startVoting();
         }
     }, 1000);
 }
 
+// SHOW ROLE
 function showRole() {
-    const result = document.getElementById("result");
-    const showBtn = document.getElementById("showBtn");
-    const sound = document.getElementById("spySound");
-
     showBtn.disabled = true;
+    result.className = "";
 
-    if (currentPlayer === spyIndex) {
-        result.innerHTML = "🕵️‍♂️ <b>تۆ جاسوسیت</b>";
+    if (spies.includes(currentPlayer)) {
+        result.innerHTML = `🕵️ تۆ جاسوسیت<br>💡 هینت: <b>${secret.category}</b>`;
         result.className = "spy";
-        sound.play();
     } else {
-        result.innerHTML = `📌 وشەکە: <b>${secretWord}</b>`;
+        result.innerHTML = `📌 وشەکە: <b>${secret.word}</b>`;
         result.className = "normal";
     }
-
-    document.getElementById("nextBtn").style.display = "block";
+    nextBtn.style.display = "block";
 }
 
+// NEXT
 function nextPlayer() {
-    document.getElementById("result").innerHTML = "";
-    document.getElementById("result").className = "";
-    document.getElementById("nextBtn").style.display = "none";
-
-    document.getElementById("showBtn").disabled = false;
-
+    result.innerHTML = "";
+    showBtn.disabled = false;
+    nextBtn.style.display = "none";
     currentPlayer++;
 
     if (currentPlayer <= totalPlayers) {
-        document.getElementById("playerText").innerText =
-            `یاریزانی ${currentPlayer} کرتە بکە`;
+        playerText.innerText = `پلەیەری ${currentPlayer} کرتە بکە`;
     } else {
-        document.getElementById("playerText").innerText =
-            "✅ یاری دەستپێبکەن – پرسیار بکەن!";
+        playerText.innerText = "🗣️ یاری دەستپێبکەن";
         startTimer();
+        addFinishBtn();
     }
 }
 
-function vote(playerNumber) {
-    if (votingDone) return; // 🔒 prevent double voting
-    votingDone = true;
+// FINISH EARLY
+function addFinishBtn() {
+    if (document.getElementById("finishBtn")) return;
+    let b = document.createElement("button");
+    b.id = "finishBtn";
+    b.innerText = "🛑 کۆتایی یاری / دەنگدان";
+    b.onclick = startVoting;
+    game.appendChild(b);
+}
 
+// VOTING
+function startVoting() {
     clearInterval(timerInterval);
-    document.getElementById("voting").style.display = "none";
-
-    const final = document.getElementById("finalResult");
-
-    if (playerNumber === spyIndex) {
-        final.innerHTML = `🎉 سەرکەوتن! جاسوس = یاریزانی ${spyIndex}`;
-        final.style.background = "#198754";
-    } else {
-        final.innerHTML = `❌ هەڵە! جاسوس = یاریزانی ${spyIndex}`;
-        final.style.background = "#ff0033";
+    voting.innerHTML = "<h3>🗳️ جاسوس کێیە؟</h3>";
+    for (let i = 1; i <= totalPlayers; i++) {
+        let b = document.createElement("button");
+        b.innerText = `پلەیەری ${i}`;
+        b.onclick = () => vote(i);
+        voting.appendChild(b);
     }
-
-    document.getElementById("restartBtn").style.display = "block";
 }
 
-function restartGame() {
-    location.reload();
+// RESULT
+function vote(p) {
+    voting.innerHTML = "";
+    if (spies.includes(p)) {
+        finalResult.innerHTML = `🎉 سەرکەوتن! جاسوس = ${spies.join(", ")}`;
+        finalResult.style.background = "#198754";
+    } else {
+        finalResult.innerHTML = `❌ هەڵە! جاسوسەکان = ${spies.join(", ")}`;
+        finalResult.style.background = "#ff0033";
+    }
+    restartBtn.style.display = "block";
 }
 
-updateTimerUI();
+function restartGame() { location.reload(); }
