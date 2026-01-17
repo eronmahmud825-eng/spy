@@ -1,61 +1,77 @@
+* {
+    box-sizing: border-box
+}
+
 body {
-    font-family: Arial, sans-serif;
-    background: linear-gradient(135deg, #141e30, #243b55);
-    color: white;
-    text-align: center;
     margin: 0;
+    font-family: Arial, sans-serif;
+    background: #0f2027;
+    color: white;
 }
 
 .container {
-    padding: 20px;
-    max-width: 420px;
+    min-height: 100vh;
+    max-width: 480px;
     margin: auto;
+    padding: 20px;
 }
 
-#timer {
-    font-size: 22px;
-    color: #00ffcc;
-    margin: 10px 0;
+h1 {
+    text-align: center
+}
+
+label {
+    display: block;
+    margin-top: 15px
+}
+
+input,
+button {
+    width: 100%;
+    padding: 14px;
+    margin-top: 8px;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
 }
 
 button {
-    width: 100%;
-    padding: 12px;
-    margin-top: 10px;
-    font-size: 16px;
-    border: none;
-    border-radius: 8px;
     background: #0d6efd;
-    color: white;
+    color: white
 }
 
-button:disabled {
-    opacity: 0.6;
+#game {
+    display: none
 }
 
-#result,
-#finalResult {
+#timer {
+    text-align: center;
+    font-size: 24px;
+    color: #00ffcc
+}
+
+#result {
     margin-top: 15px;
-    font-size: 22px;
     padding: 15px;
     border-radius: 10px;
+    text-align: center
 }
 
 .spy {
-    background: #ff0033;
+    background: #ff0033
 }
 
 .normal {
-    background: #198754;
+    background: #198754
 }
 
 #nextBtn,
-#voting,
 #restartBtn {
-    display: none;
+    display: none
 }
 
 #voting button {
     background: #ffc107;
     color: black;
+    margin-top: 6px;
 }
