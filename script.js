@@ -17,15 +17,46 @@ const finalResult = document.getElementById("finalResult");
 const restartBtn = document.getElementById("restartBtn");
 
 // ================= WORDS =================
-const words = [
-    { category: "شار/ووڵات", hint2: "شراو", items: ["سلێمانی", "هەولێر", "دهۆک", "کرکوک", "کووردستان", "کەنەدا", "ئەمەریکا", "نیۆڕک", "لەندەن", "ئاکرێ", "ئەرجەنتین", "فەرەنەسا", "پاریس", "ئیسپانیا"] },
-    { category: "خواردن", hint2: "خواردنێکی ناسراو", items: ["کەباب", "پیتزا", "بەریانی", "دۆنەر", "ماسی", "برنج", "یاپراخ", "شفتە", "کفتە", "مریشک", "گۆشت", "سووپ"] },
-    { category: "سۆشیال میدیا", hint2: "پلاتفۆرمی ئینتەرنێت", items: ["یوتوب", "تیکتۆک", "فەیسبووک", "ئینستاگرام", "ئێکس", "تویچ", "سناپ", "مەنسچەر", "دیسکۆرد", "چاتجیپیتی", "جیمینی", "کڵاود ئەی ئای"] },
-    { category: "ئاژەڵ", hint2: "زیندووی وشک", items: ["سەگ", "پشیلە", "مانگا", "دووپشک", "مار", "گوورگ", "شێر", "بزن", "کەر", "مەیموون", "ووشتر", "کۆتر", "مریشک", "قەل", "قاز", "مراوی", "ماسی", "نەهەنگ", "حووت", "زەڕافە"] },
+const words = [{
+        category: "شار/ووڵات",
+        hint2: "شوێنێکی ناسراو",
+        items: [
+            "سلێمانی", "هەولێر", "دهۆک", "کرکوک", "کووردستان", "کەنەدا", "ئەمەریکا",
+            "نیۆڕک", "لەندەن", "ئاکرێ", "ئەرجەنتین", "فەرەنسا", "پاریس", "ئیسپانیا",
+            "ئیتالیا", "ئالمانیا", "تورکیا", "ئێران", "ژاپۆن"
+        ]
+    },
+    {
+        category: "خواردن",
+        hint2: "خواردنێکی ناسراو",
+        items: [
+            "کەباب", "پیتزا", "بەریانی", "دۆنەر", "ماسی", "برنج", "یاپراخ", "شفتە",
+            "کفتە", "مریشک", "گۆشت", "سووپ", "هەمبەرگەر", "پاستا", "ساندویچ"
+        ]
+    },
+    {
+        category: "سۆشیال میدیا",
+        hint2: "پلاتفۆرمی ئینتەرنێت",
+        items: [
+            "یوتوب", "تیکتۆک", "فەیسبووک", "ئینستاگرام", "ئێکس", "تویچ", "سناپ",
+            "دیسکۆرد", "چاتجیپیتی", "جیمینی", "کڵاود ئەی ئای", "واتساپ", "تێلێگرام"
+        ]
+    },
+    {
+        category: "ئاژەڵ",
+        hint2: "زیندووی وشک",
+        items: [
+            "سەگ", "پشیلە", "مانگا", "مار", "گوورگ", "شێر", "بزن", "کەر", "مەیموون",
+            "ووشتر", "کۆتر", "قاز", "ماسی", "نەهەنگ", "زەرافە", "فیل"
+        ]
+    },
     {
         category: "بێگیان/شت",
         hint2: "شتێکی ڕۆژانە",
-        items: ["کورسی", "فڕن", "قەنەفە", "زۆپا", "سەیارە", "تەیارە", "مۆبایل", "تەلەفزیۆن", "گسک", "جادە", "بەلەم", "بەرد", "تەناف", "قارمە", "جل"]
+        items: [
+            "کورسی", "فڕن", "قەنەفە", "زۆپا", "سەیارە", "تەیارە", "مۆبایل",
+            "تەلەفزیۆن", "جادە", "بەلەم", "بەرد", "تەناف", "جل", "کاتژمێر", "کەرت"
+        ]
     }
 ];
 
@@ -41,12 +72,23 @@ let secret = null;
 let timerInterval = null;
 let hint2Shown = false;
 
-// 🔒 بۆ دووبارە نەهاتن
-let usedSecrets = [];
-const MAX_HISTORY = 7; // ٦–٧ یاری
+// 🔒 no repetition
+let usedSecrets = JSON.parse(localStorage.getItem("usedSecrets")) || [];
+const MAX_HISTORY = 7;
+
+// ================= AUTO START IF SAVED =================
+window.onload = () => {
+    const saved = JSON.parse(localStorage.getItem("gameSettings"));
+    if (saved) {
+        playersInput.value = saved.players;
+        spiesInput.value = saved.spies;
+        minutesInput.value = saved.minutes;
+        startGame(true);
+    }
+};
 
 // ================= START GAME =================
-function startGame() {
+function startGame(auto = false) {
     totalPlayers = Number(playersInput.value);
     spyCount = Number(spiesInput.value);
     time = Number(minutesInput.value) * 60;
@@ -55,13 +97,22 @@ function startGame() {
     spies = [];
     hint2Shown = false;
 
+    // save settings
+    localStorage.setItem(
+        "gameSettings",
+        JSON.stringify({
+            players: totalPlayers,
+            spies: spyCount,
+            minutes: minutesInput.value
+        })
+    );
+
     // choose spies
     while (spies.length < spyCount) {
         let r = Math.floor(Math.random() * totalPlayers) + 1;
         if (!spies.includes(r)) spies.push(r);
     }
 
-    // choose secret without repetition
     secret = getUniqueSecret();
 
     setup.style.display = "none";
@@ -71,34 +122,27 @@ function startGame() {
     playerText.innerText = "پلەیەری 1 کرتە بکە";
 }
 
-// ================= UNIQUE WORD =================
+// ================= UNIQUE SECRET =================
 function getUniqueSecret() {
-    let attempts = 0;
+    let tries = 0;
 
-    while (attempts < 100) {
-        const group = words[Math.floor(Math.random() * words.length)];
-        const word = group.items[Math.floor(Math.random() * group.items.length)];
-        const key = group.category + "|" + word;
+    while (tries < 200) {
+        const g = words[Math.floor(Math.random() * words.length)];
+        const w = g.items[Math.floor(Math.random() * g.items.length)];
+        const key = g.category + "|" + w;
 
         if (!usedSecrets.includes(key)) {
             usedSecrets.push(key);
+            if (usedSecrets.length > MAX_HISTORY) usedSecrets.shift();
+            localStorage.setItem("usedSecrets", JSON.stringify(usedSecrets));
 
-            // پاککردنەوەی مێژوو کاتێک زۆر بوو
-            if (usedSecrets.length > MAX_HISTORY) {
-                usedSecrets.shift();
-            }
-
-            return {
-                word: word,
-                category: group.category,
-                hint2: group.hint2
-            };
+            return { word: w, category: g.category, hint2: g.hint2 };
         }
-        attempts++;
+        tries++;
     }
 
-    // ئەگەر هەموو شتان بەکار هاتوون
     usedSecrets = [];
+    localStorage.setItem("usedSecrets", JSON.stringify([]));
     return getUniqueSecret();
 }
 
@@ -130,12 +174,10 @@ function startTimer() {
 function showRole() {
     result.innerHTML = "";
     result.className = "";
-    result.style.background = "";
-
     showBtn.disabled = true;
 
     if (spies.includes(currentPlayer)) {
-        result.innerHTML = `🕵️ <b>تۆ جاسوسیت</b><br>جۆر: <b>${secret.category}</b>`;
+        result.innerHTML = `🕵️ تۆ جاسوسیت<br>جۆر: <b>${secret.category}</b>`;
         result.className = "spy";
     } else {
         result.innerHTML = `📌 وشەکە: <b>${secret.word}</b>`;
@@ -149,8 +191,6 @@ function showRole() {
 function nextPlayer() {
     result.innerHTML = "";
     result.className = "";
-    result.style.background = "";
-
     showBtn.disabled = false;
     nextBtn.style.display = "none";
 
@@ -168,7 +208,6 @@ function nextPlayer() {
 // ================= FINISH EARLY =================
 function addFinishBtn() {
     if (document.getElementById("finishBtn")) return;
-
     const b = document.createElement("button");
     b.id = "finishBtn";
     b.innerText = "🛑 کۆتایی یاری / دەنگدان";
@@ -179,7 +218,6 @@ function addFinishBtn() {
 // ================= VOTING =================
 function startVoting() {
     clearInterval(timerInterval);
-
     voting.innerHTML = "<h3>🗳️ جاسوس کێیە؟</h3>";
 
     for (let i = 1; i <= totalPlayers; i++) {
@@ -193,15 +231,9 @@ function startVoting() {
 // ================= RESULT =================
 function vote(p) {
     voting.innerHTML = "";
-
-    if (spies.includes(p)) {
-        finalResult.innerHTML = `🎉 سەرکەوتن! جاسوس = ${spies.join(", ")}`;
-        finalResult.style.background = "#198754";
-    } else {
-        finalResult.innerHTML = `❌ هەڵە! جاسوسەکان = ${spies.join(", ")}`;
-        finalResult.style.background = "#dc3545";
-    }
-
+    finalResult.innerHTML = spies.includes(p) ?
+        `🎉 سەرکەوتن! جاسوس = ${spies.join(", ")}` :
+        `❌ هەڵە! جاسوسەکان = ${spies.join(", ")}`;
     restartBtn.style.display = "block";
 }
 
