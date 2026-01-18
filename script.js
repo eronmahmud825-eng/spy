@@ -235,9 +235,40 @@ function vote(p) {
         `🎉 سەرکەوتن! جاسوس = ${spies.join(", ")}` :
         `❌ هەڵە! جاسوسەکان = ${spies.join(", ")}`;
     restartBtn.style.display = "block";
+    addSettingsBtn();
+
 }
 
 // ================= RESTART =================
 function restartGame() {
     location.reload();
+} // ================= BACK TO SETTINGS =================
+function addSettingsBtn() {
+    if (document.getElementById("settingsBtn")) return;
+
+    const b = document.createElement("button");
+    b.id = "settingsBtn";
+    b.innerText = "⚙️ گەڕانەوە بۆ ڕێکخستن";
+    b.style.marginTop = "10px";
+    b.onclick = backToSettings;
+    game.appendChild(b);
+}
+
+function backToSettings() {
+    // وەستاندنی کاتژمێر
+    clearInterval(timerInterval);
+
+    // شاردنەوەی یاری
+    game.style.display = "none";
+
+    // پیشاندانی فۆڕمی ڕێکخستن
+    setup.style.display = "block";
+
+    // پاککردنەوەی بەشەکانی یاری
+    voting.innerHTML = "";
+    finalResult.innerHTML = "";
+    restartBtn.style.display = "none";
+
+    // دەتوانیت ئەمە هەڵبگریت یان بسڕیت بۆ reset تەواو
+    // localStorage.removeItem("gameSettings");
 }
