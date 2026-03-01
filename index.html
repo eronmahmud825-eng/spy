@@ -1,49 +1,646 @@
 <!DOCTYPE html>
 <html lang="ku">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Online Spy Game</title>
-<link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🕵️ یاری جاسوس - ئۆنلاین</title>
+    <style>
+        * { box-sizing: border-box; font-family: system-ui, sans-serif; }
+        body {
+            margin: 0;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            min-height: 100vh;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .screen { display: none; max-width: 440px; width: 100%; padding: 24px; }
+        .screen.active { display: block; }
+        .card {
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 24px;
+            padding: 28px 24px;
+            backdrop-filter: blur(12px);
+        }
+        h1 { font-size: 2rem; margin: 0 0 6px; }
+        .subtitle { color: #aaa; margin: 0 0 24px; }
+        label { display: block; margin-top: 14px; margin-bottom: 4px; text-align: right; font-size: 14px; color: #ccc; }
+        input[type=number], input[type=text] {
+            width: 100%; padding: 13px 16px; border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.1);
+            color: white; font-size: 16px; outline: none;
+        }
+        input::placeholder { color: rgba(255,255,255,0.4); }
+        button {
+            width: 100%; margin-top: 14px; padding: 15px;
+            border: none; border-radius: 16px; font-size: 16px;
+            font-weight: bold; cursor: pointer; transition: transform 0.1s, opacity 0.2s;
+        }
+        button:active { transform: scale(0.97); }
+        button:disabled { opacity: 0.4; cursor: not-allowed; }
+        .btn-primary { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+        .btn-success { background: linear-gradient(135deg, #11998e, #38ef7d); color: #111; }
+        .btn-danger { background: linear-gradient(135deg, #eb3349, #f45c43); color: white; }
+        .btn-warn { background: linear-gradient(135deg, #f7971e, #ffd200); color: #111; }
+        .btn-grey { background: rgba(255,255,255,0.15); color: white; }
+        .room-code {
+            font-size: 3rem; font-weight: 900; letter-spacing: 10px;
+            text-align: center; color: #ffd200; padding: 16px 0;
+            cursor: pointer; user-select: all;
+        }
+        .room-code-label { text-align: center; color: #aaa; font-size: 13px; margin-top: -10px; }
+        .players-list { margin-top: 16px; }
+        .player-item {
+            background: rgba(255,255,255,0.08);
+            border-radius: 12px; padding: 12px 16px;
+            margin-bottom: 8px; display: flex;
+            align-items: center; justify-content: space-between;
+            font-size: 15px;
+        }
+        .player-item .dot { width: 10px; height: 10px; border-radius: 50%; background: #38ef7d; }
+        .player-host-badge {
+            font-size: 11px; background: #667eea;
+            padding: 2px 8px; border-radius: 8px; color: white;
+        }
+        #timer {
+            font-size: 2.5rem; font-weight: 900; text-align: center;
+            padding: 14px; border-radius: 16px;
+            background: rgba(255,255,255,0.07);
+            margin-bottom: 14px; letter-spacing: 3px;
+        }
+        #timer.danger { color: #f45c43; animation: pulse 1s infinite; }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+        .role-card {
+            padding: 24px; border-radius: 20px; text-align: center;
+            font-size: 1.1rem; margin: 16px 0; line-height: 1.8;
+        }
+        .role-card.spy { background: linear-gradient(135deg, #eb3349, #f45c43); }
+        .role-card.normal { background: linear-gradient(135deg, #11998e, #38ef7d); color: #111; }
+        .role-card .big { font-size: 1.6rem; font-weight: 900; display: block; margin-top: 6px; }
+        .vote-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+        .vote-btn {
+            margin: 0; padding: 14px 10px; border-radius: 14px;
+            background: rgba(255,193,7,0.2); border: 2px solid #ffc107;
+            color: #ffd200; font-size: 15px; font-weight: bold;
+        }
+        .vote-btn:hover { background: rgba(255,193,7,0.4); }
+        .final-result {
+            padding: 20px; border-radius: 20px; text-align: center;
+            font-size: 1.2rem; margin: 14px 0;
+        }
+        .final-result.win { background: linear-gradient(135deg, #11998e33, #38ef7d33); border: 2px solid #38ef7d; }
+        .final-result.lose { background: linear-gradient(135deg, #eb334933, #f45c4333); border: 2px solid #f45c43; }
+        .status-msg { text-align: center; color: #aaa; font-size: 14px; margin: 10px 0; }
+        .divider { height: 1px; background: rgba(255,255,255,0.1); margin: 18px 0; }
+        .tabs { display: flex; gap: 8px; margin-bottom: 18px; }
+        .tab {
+            flex: 1; padding: 11px; border-radius: 12px; border: none;
+            background: rgba(255,255,255,0.08); color: #aaa;
+            font-size: 14px; font-weight: bold; cursor: pointer; margin: 0;
+            transition: all 0.2s;
+        }
+        .tab.active { background: rgba(102,126,234,0.4); color: white; border: 1px solid #667eea; }
+        .hint-banner {
+            background: rgba(255,193,7,0.15); border: 1px solid #ffc107;
+            border-radius: 14px; padding: 14px; text-align: center;
+            font-size: 15px; margin: 12px 0;
+        }
+        .waiting-dots::after {
+            content: '...';
+            animation: dots 1.2s steps(4,end) infinite;
+        }
+        @keyframes dots {
+            0%,20%{content:'.'} 40%{content:'..'} 60%,100%{content:'...'}
+        }
+        .error-msg { color: #f45c43; text-align: center; margin-top: 8px; font-size: 14px; }
+        #copyNotice { font-size:12px; color:#38ef7d; text-align:center; height:16px; }
+    </style>
 </head>
 <body>
 
-<div class="container">
-
-<h2>🕵️ Online Spy Game</h2>
-
-<div id="home">
-<input id="name" placeholder="ناوی خۆت">
-
-<button onclick="createRoom()">🎮 دروستکردنی Room</button>
-
-<input id="roomInput" placeholder="Room Code">
-<button onclick="joinRoom()">➡️ چوونە ژوورەوە</button>
+<!-- ===== SCREEN 1: HOME ===== -->
+<div class="screen active" id="screenHome">
+    <div class="card">
+        <h1>🕵️ یاری جاسوس</h1>
+        <p class="subtitle">یاری ئۆنلاین بەشێو گروپ</p>
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('create')">🆕 دروستکردن</button>
+            <button class="tab" onclick="showTab('join')">🔗 بەشداربوون</button>
+        </div>
+        <!-- Create Room -->
+        <div id="tabCreate">
+            <label>👤 ناوت</label>
+            <input type="text" id="createName" placeholder="ناوت بنووسە" maxlength="16">
+            <label>👥 ژمارەی پلەیەرەکان</label>
+            <input type="number" id="createPlayers" min="3" max="20" value="6">
+            <label>🕵️ ژمارەی جاسوسەکان</label>
+            <input type="number" id="createSpies" min="1" max="5" value="1">
+            <label>⏱️ ماوە (خولەک)</label>
+            <input type="number" id="createMinutes" min="1" max="20" value="5">
+            <button class="btn-primary" onclick="createRoom()">🚀 دروستکردنی ژووری نوێ</button>
+        </div>
+        <!-- Join Room -->
+        <div id="tabJoin" style="display:none">
+            <label>👤 ناوت</label>
+            <input type="text" id="joinName" placeholder="ناوت بنووسە" maxlength="16">
+            <label>🔑 کۆدی ژوور</label>
+            <input type="text" id="joinCode" placeholder="مەسەلەن: AB12" maxlength="4" style="letter-spacing:6px;text-align:center;font-size:1.4rem;font-weight:900;text-transform:uppercase">
+            <button class="btn-success" onclick="joinRoom()">🔗 بەشداربوون</button>
+        </div>
+        <div id="homeError" class="error-msg"></div>
+    </div>
 </div>
 
-<div id="room" class="hidden">
-<h3 id="roomCodeText"></h3>
-
-<div id="settings" class="hidden">
-<input type="number" id="spyCount" min="1" max="3" value="1" placeholder="ژمارەی جاسوس">
-<input type="number" id="minutes" min="1" max="20" value="5" placeholder="کات (خولەک)">
+<!-- ===== SCREEN 2: LOBBY ===== -->
+<div class="screen" id="screenLobby">
+    <div class="card">
+        <h1>🏠 ژووری چاوەڕوان</h1>
+        <p class="room-code" id="lobbyCode" onclick="copyCode()" title="کرتە بکە بۆ کۆپی">----</p>
+        <p class="room-code-label">کۆدی ژوور — کرتە بکە بۆ کۆپی</p>
+        <div id="copyNotice"></div>
+        <div class="divider"></div>
+        <p style="color:#aaa;font-size:13px;margin:0 0 10px">
+            پلەیەرەکان بەشداربوون: <span id="joinedCount">1</span> / <span id="neededCount">6</span>
+        </p>
+        <div class="players-list" id="lobbyPlayers"></div>
+        <div class="divider"></div>
+        <div id="startArea">
+            <button class="btn-success" id="startBtn" onclick="hostStartGame()" style="display:none">
+                ▶️ دەستپێکردنی یاری
+            </button>
+            <p class="status-msg waiting-dots" id="waitMsg">چاوەڕوانی بۆ دەستپێکردنی هۆستەکە</p>
+        </div>
+        <button class="btn-grey" onclick="leaveRoom()" style="margin-top:6px">🚪 چوونەدەرەوە</button>
+    </div>
 </div>
 
-<div id="players"></div>
-
-<button id="startBtn" onclick="startGame()">🚀 دەستپێکردن</button>
+<!-- ===== SCREEN 3: ROLE REVEAL ===== -->
+<div class="screen" id="screenRole">
+    <div class="card" style="text-align:center">
+        <h2 id="rolePlayerName">پلەیەری ...</h2>
+        <p style="color:#aaa;font-size:14px">کرتە بکە بۆ دیتنی ڕۆڵەکەت</p>
+        <button class="btn-primary" id="revealBtn" onclick="revealRole()">👁️ پیشاندانی ڕۆڵ</button>
+        <div id="roleResult" style="display:none"></div>
+        <div id="roleReady" style="display:none">
+            <div class="divider"></div>
+            <p class="status-msg">پلەیەری داهاتوو چاوەڕوانە</p>
+            <p class="status-msg" id="readyCount"></p>
+        </div>
+    </div>
 </div>
 
-<div id="game" class="hidden">
-<div id="timer"></div>
-<div class="card" id="roleCard"></div>
-<div id="result"></div>
-<button onclick="location.reload()">🔄 یاری نوێ</button>
+<!-- ===== SCREEN 4: GAME (DISCUSSION) ===== -->
+<div class="screen" id="screenGame">
+    <div class="card">
+        <div id="timer">⏱️ 00:00</div>
+        <div id="gameHint" style="display:none" class="hint-banner"></div>
+        <div class="role-card" id="gameRoleReminder"></div>
+        <div class="divider"></div>
+        <h3 style="text-align:center;margin:0 0 10px">🗳️ جاسوس کێیە؟</h3>
+        <div class="vote-grid" id="voteButtons"></div>
+        <div id="voteStatus" class="status-msg"></div>
+        <div id="gameResult" style="display:none"></div>
+        <div id="gameButtons" style="display:none">
+            <button class="btn-success" onclick="playAgain()">🔄 یاری نوێ</button>
+            <button class="btn-grey" onclick="leaveRoom()" style="margin-top:8px">🏠 گەڕانەوە بۆ دەستپێک</button>
+        </div>
+    </div>
 </div>
 
-</div>
+<!-- Firebase SDKs -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, set, get, push, onValue, update, remove, off, serverTimestamp }
+    from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-<script type="module" src="script.js"></script>
+const firebaseConfig = {
+    apiKey: "AIzaSyAzpQ9kpRs9syqFJkL4khpJg-f8Hf3rQi8",
+    authDomain: "spygames-c2744.firebaseapp.com",
+    projectId: "spygames-c2744",
+    databaseURL: "https://spygames-c2744-default-rtdb.firebaseio.com",
+    storageBucket: "spygames-c2744.firebasestorage.app",
+    messagingSenderId: "508332573335",
+    appId: "1:508332573335:web:2893d35f1c0b25e81e9fd2",
+    measurementId: "G-9Z9DTTV668"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+// ====== WORD LIST ======
+const WORDS = [
+    { category: "شار/ووڵات", hint2: "شوێنێکی ناسراو", items: ["سلێمانی","هەولێر","دهۆک","کرکوک","کووردستان","کەنەدا","ئەمەریکا","نیۆڕک","لەندەن","ئاکرێ","پاریس","ئیتالیا","ئالمانیا","تورکیا","ئێران","ژاپۆن"] },
+    { category: "خواردن", hint2: "خواردنێکی ناسراو", items: ["کەباب","پیتزا","بەریانی","دۆنەر","ماسی","برنج","یاپراخ","شفتە","کفتە","مریشک","گۆشت","سووپ","هەمبەرگەر","پاستا","ساندویچ"] },
+    { category: "سۆشیال میدیا", hint2: "پلاتفۆرمی ئینتەرنێت", items: ["یوتوب","تیکتۆک","فەیسبووک","ئینستاگرام","ئێکس","تویچ","سناپ","دیسکۆرد","واتساپ","تێلێگرام"] },
+    { category: "ئاژەڵ", hint2: "زیندووی وشک", items: ["سەگ","پشیلە","مانگا","مار","گوورگ","شێر","بزن","کەر","مەیموون","ووشتر","کۆتر","قاز","نەهەنگ","زەرافە","فیل"] },
+    { category: "بێگیان/شت", hint2: "شتێکی ڕۆژانە", items: ["کورسی","فڕن","قەنەفە","زۆپا","سەیارە","تەیارە","مۆبایل","تەلەفزیۆن","جادە","بەلەم","بەرد","تەناف","جل","کاتژمێر","کەرت"] },
+    { category: "وەرزش", hint2: "چالاکییەکی جەستەیی", items: ["فوتبۆل","بەسکێتبۆل","تێنیس","موی تای","شناکردن","دووخستن","والێبۆل","بۆکس"] }
+];
+
+// ====== STATE ======
+let myId = null;
+let myName = "";
+let roomCode = "";
+let isHost = false;
+let myRole = null; // 'spy' or 'normal'
+let myWord = null;
+let myCategory = null;
+let timerInterval = null;
+let listeners = [];
+let totalPlayersNeeded = 0;
+
+// ====== UTILS ======
+function uid() { return Math.random().toString(36).substr(2,9); }
+
+function genCode() {
+    const c = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    return Array.from({length:4},()=>c[Math.floor(Math.random()*c.length)]).join('');
+}
+
+function pickSecret() {
+    const g = WORDS[Math.floor(Math.random()*WORDS.length)];
+    const w = g.items[Math.floor(Math.random()*g.items.length)];
+    return { word: w, category: g.category, hint2: g.hint2 };
+}
+
+function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+}
+
+function setError(msg) { document.getElementById('homeError').innerText = msg; }
+
+// ====== TABS ======
+window.showTab = function(tab) {
+    document.getElementById('tabCreate').style.display = tab==='create'?'block':'none';
+    document.getElementById('tabJoin').style.display   = tab==='join'?'block':'none';
+    document.querySelectorAll('.tab').forEach((t,i)=>{
+        t.classList.toggle('active', (tab==='create'&&i===0)||(tab==='join'&&i===1));
+    });
+};
+
+// ====== CREATE ROOM ======
+window.createRoom = async function() {
+    const name = document.getElementById('createName').value.trim();
+    const players = Number(document.getElementById('createPlayers').value);
+    const spies = Number(document.getElementById('createSpies').value);
+    const minutes = Number(document.getElementById('createMinutes').value);
+
+    if (!name) { setError("ناوت بنووسە!"); return; }
+    setError("");
+
+    myId = uid();
+    myName = name;
+    isHost = true;
+    roomCode = genCode();
+    totalPlayersNeeded = players;
+
+    const roomRef = ref(db, `rooms/${roomCode}`);
+    await set(roomRef, {
+        host: myId,
+        status: 'lobby',
+        settings: { players, spies, minutes },
+        players: { [myId]: { name, ready: false, host: true } }
+    });
+
+    enterLobby();
+};
+
+// ====== JOIN ROOM ======
+window.joinRoom = async function() {
+    const name = document.getElementById('joinName').value.trim();
+    const code = document.getElementById('joinCode').value.trim().toUpperCase();
+
+    if (!name) { setError("ناوت بنووسە!"); return; }
+    if (!code) { setError("کۆدی ژوور بنووسە!"); return; }
+    setError("");
+
+    const roomRef = ref(db, `rooms/${code}`);
+    const snap = await get(roomRef);
+
+    if (!snap.exists()) { setError("ژوورەکە نەدۆزرایەوە!"); return; }
+    const room = snap.val();
+    if (room.status !== 'lobby') { setError("یاریەکە دەستی پێکردووە!"); return; }
+
+    myId = uid();
+    myName = name;
+    isHost = false;
+    roomCode = code;
+    totalPlayersNeeded = room.settings.players;
+
+    await update(ref(db, `rooms/${roomCode}/players/${myId}`), { name, ready: false, host: false });
+
+    enterLobby();
+};
+
+// ====== LOBBY ======
+function enterLobby() {
+    showScreen('screenLobby');
+    document.getElementById('lobbyCode').innerText = roomCode;
+    document.getElementById('neededCount').innerText = totalPlayersNeeded;
+
+    // Listen players
+    const pRef = ref(db, `rooms/${roomCode}/players`);
+    const pListener = onValue(pRef, snap => {
+        const players = snap.val() || {};
+        const list = Object.entries(players);
+        document.getElementById('joinedCount').innerText = list.length;
+        document.getElementById('neededCount').innerText = totalPlayersNeeded;
+
+        const el = document.getElementById('lobbyPlayers');
+        el.innerHTML = '';
+        list.forEach(([id, p]) => {
+            const d = document.createElement('div');
+            d.className = 'player-item';
+            d.innerHTML = `<div style="display:flex;align-items:center;gap:10px">
+                <div class="dot"></div>
+                <span>${p.name}</span>
+                ${p.host ? '<span class="player-host-badge">هۆست</span>' : ''}
+            </div>`;
+            el.appendChild(d);
+        });
+
+        if (isHost) {
+            const btn = document.getElementById('startBtn');
+            const msg = document.getElementById('waitMsg');
+            if (list.length >= 2) {
+                btn.style.display = 'block';
+                msg.style.display = 'none';
+            } else {
+                btn.style.display = 'none';
+                msg.style.display = 'block';
+            }
+        }
+    });
+    listeners.push({ ref: pRef, listener: pListener });
+
+    // Listen game start
+    const gRef = ref(db, `rooms/${roomCode}/status`);
+    const gListener = onValue(gRef, snap => {
+        const status = snap.val();
+        if (status === 'reveal') enterReveal();
+        if (status === 'playing') enterGame();
+    });
+    listeners.push({ ref: gRef, listener: gListener });
+
+    if (!isHost) {
+        document.getElementById('startBtn').style.display = 'none';
+        document.getElementById('waitMsg').style.display = 'block';
+    }
+}
+
+window.copyCode = function() {
+    navigator.clipboard.writeText(roomCode).then(()=>{
+        const n = document.getElementById('copyNotice');
+        n.innerText = '✅ کۆپی کرا!';
+        setTimeout(()=>n.innerText='',2000);
+    });
+};
+
+// ====== HOST START ======
+window.hostStartGame = async function() {
+    const snap = await get(ref(db, `rooms/${roomCode}`));
+    const room = snap.val();
+    const playerIds = Object.keys(room.players);
+    const settings = room.settings;
+    const spyCount = settings.spies;
+
+    // Assign spies
+    const shuffled = [...playerIds].sort(()=>Math.random()-0.5);
+    const spyIds = shuffled.slice(0, spyCount);
+
+    // Pick secret
+    const secret = pickSecret();
+
+    // Assign roles
+    const roles = {};
+    playerIds.forEach(id => {
+        roles[id] = { role: spyIds.includes(id) ? 'spy' : 'normal' };
+    });
+
+    await update(ref(db, `rooms/${roomCode}`), {
+        status: 'reveal',
+        roles,
+        secret,
+        spies: spyIds,
+        readyCount: 0,
+        totalPlayers: playerIds.length,
+        gameStartTime: serverTimestamp(),
+        votedOut: null,
+        result: null
+    });
+};
+
+// ====== REVEAL ======
+async function enterReveal() {
+    showScreen('screenRole');
+
+    // Get my role
+    const roleSnap = await get(ref(db, `rooms/${roomCode}/roles/${myId}`));
+    const secretSnap = await get(ref(db, `rooms/${roomCode}/secret`));
+
+    const roleData = roleSnap.val();
+    const secret = secretSnap.val();
+
+    myRole = roleData.role;
+    myWord = secret.word;
+    myCategory = secret.category;
+
+    document.getElementById('rolePlayerName').innerText = `${myName} 👤`;
+    document.getElementById('revealBtn').disabled = false;
+    document.getElementById('roleResult').style.display = 'none';
+    document.getElementById('roleReady').style.display = 'none';
+
+    // Watch ready count
+    const totalSnap = await get(ref(db, `rooms/${roomCode}/totalPlayers`));
+    const total = totalSnap.val();
+
+    const rcRef = ref(db, `rooms/${roomCode}/readyCount`);
+    const rcListener = onValue(rcRef, snap => {
+        const cnt = snap.val() || 0;
+        document.getElementById('readyCount').innerText = `${cnt} / ${total} ئامادەن`;
+        if (cnt >= total) {
+            update(ref(db, `rooms/${roomCode}`), { status: 'playing' });
+        }
+    });
+    listeners.push({ ref: rcRef, listener: rcListener });
+}
+
+window.revealRole = async function() {
+    document.getElementById('revealBtn').disabled = true;
+    const resultEl = document.getElementById('roleResult');
+    resultEl.style.display = 'block';
+
+    if (myRole === 'spy') {
+        resultEl.innerHTML = `<div class="role-card spy">🕵️ تۆ جاسوسیت!<span class="big">جۆر: ${myCategory}</span></div>`;
+    } else {
+        resultEl.innerHTML = `<div class="role-card normal">✅ تۆ شارەزایی!<span class="big">📌 ${myWord}</span></div>`;
+    }
+
+    document.getElementById('roleReady').style.display = 'block';
+
+    // Increment ready
+    const snap = await get(ref(db, `rooms/${roomCode}/readyCount`));
+    const cur = snap.val() || 0;
+    await set(ref(db, `rooms/${roomCode}/readyCount`), cur + 1);
+};
+
+// ====== GAME (DISCUSSION + VOTE) ======
+async function enterGame() {
+    showScreen('screenGame');
+
+    // Show role reminder
+    const reminderEl = document.getElementById('gameRoleReminder');
+    if (myRole === 'spy') {
+        reminderEl.className = 'role-card spy';
+        reminderEl.innerHTML = `🕵️ تۆ جاسوسیت — جۆر: <b>${myCategory}</b>`;
+    } else {
+        reminderEl.className = 'role-card normal';
+        reminderEl.innerHTML = `📌 وشەکە: <b>${myWord}</b>`;
+    }
+
+    // Timer
+    const settingsSnap = await get(ref(db, `rooms/${roomCode}/settings`));
+    const settings = settingsSnap.val();
+    let timeLeft = settings.minutes * 60;
+    const halfTime = timeLeft / 2;
+    let hint2Shown = false;
+
+    const secretSnap = await get(ref(db, `rooms/${roomCode}/secret`));
+    const secret = secretSnap.val();
+
+    updateTimerDisplay(timeLeft);
+    timerInterval = setInterval(()=>{
+        timeLeft--;
+        updateTimerDisplay(timeLeft);
+
+        if (!hint2Shown && timeLeft <= halfTime) {
+            hint2Shown = true;
+            const hintEl = document.getElementById('gameHint');
+            hintEl.style.display = 'block';
+            hintEl.innerHTML = `💡 <b>هینتی دووەم:</b> ${secret.hint2}`;
+        }
+
+        if (timeLeft <= 10) document.getElementById('timer').classList.add('danger');
+        if (timeLeft <= 0) { clearInterval(timerInterval); }
+    }, 1000);
+
+    // Vote buttons
+    const playersSnap = await get(ref(db, `rooms/${roomCode}/players`));
+    const players = playersSnap.val();
+    const voteGrid = document.getElementById('voteButtons');
+    voteGrid.innerHTML = '';
+    Object.entries(players).forEach(([id, p]) => {
+        const btn = document.createElement('button');
+        btn.className = 'vote-btn';
+        btn.innerText = `🧑 ${p.name}`;
+        btn.onclick = () => castVote(id, p.name);
+        voteGrid.appendChild(btn);
+    });
+
+    // Listen for result
+    const resRef = ref(db, `rooms/${roomCode}/result`);
+    const resListener = onValue(resRef, snap => {
+        const result = snap.val();
+        if (result) showFinalResult(result);
+    });
+    listeners.push({ ref: resRef, listener: resListener });
+}
+
+function updateTimerDisplay(t) {
+    const m = String(Math.floor(t/60)).padStart(2,'0');
+    const s = String(t%60).padStart(2,'0');
+    document.getElementById('timer').innerText = `⏱️ ${m}:${s}`;
+}
+
+window.castVote = async function(targetId, targetName) {
+    clearInterval(timerInterval);
+
+    document.querySelectorAll('.vote-btn').forEach(b=>b.disabled=true);
+    document.getElementById('voteStatus').innerText = `دەنگت دا بۆ ${targetName}...`;
+
+    // Gather spy list
+    const spiesSnap = await get(ref(db, `rooms/${roomCode}/spies`));
+    const spies = spiesSnap.val() || [];
+    const isSpyCaught = spies.includes(targetId);
+
+    const playersSnap = await get(ref(db, `rooms/${roomCode}/players`));
+    const players = playersSnap.val();
+
+    const spyNames = spies.map(id => players[id]?.name || 'نەناسراو');
+
+    await update(ref(db, `rooms/${roomCode}`), {
+        result: {
+            votedId: targetId,
+            votedName: targetName,
+            spyCaught: isSpyCaught,
+            spyNames,
+            timestamp: Date.now()
+        }
+    });
+};
+
+function showFinalResult(result) {
+    clearInterval(timerInterval);
+    document.getElementById('voteButtons').innerHTML = '';
+    document.getElementById('voteStatus').innerText = '';
+
+    const el = document.getElementById('gameResult');
+    el.style.display = 'block';
+
+    if (result.spyCaught) {
+        el.className = 'final-result win';
+        el.innerHTML = `🎉 سەرکەوتن!<br>جاسوس ${result.votedName} دەستگیر کرا!<br><small>جاسوسەکان: ${result.spyNames.join('، ')}</small>`;
+    } else {
+        el.className = 'final-result lose';
+        el.innerHTML = `❌ هەڵەیە! جاسوسەکە فڕی دا!<br>دەنگت دا بۆ ${result.votedName}<br><small>جاسوسەکان: ${result.spyNames.join('، ')}</small>`;
+    }
+
+    document.getElementById('gameButtons').style.display = 'block';
+}
+
+// ====== PLAY AGAIN ======
+window.playAgain = async function() {
+    if (isHost) {
+        // Reset for new game with same settings
+        const snap = await get(ref(db, `rooms/${roomCode}/players`));
+        const players = snap.val();
+        await update(ref(db, `rooms/${roomCode}`), {
+            status: 'lobby',
+            roles: null, secret: null, spies: null,
+            readyCount: 0, result: null, votedOut: null
+        });
+        enterLobby();
+    } else {
+        // Non-host just re-enters lobby
+        enterLobby();
+    }
+};
+
+// ====== LEAVE ======
+window.leaveRoom = async function() {
+    clearAll();
+    await remove(ref(db, `rooms/${roomCode}/players/${myId}`));
+    roomCode = '';
+    myId = null;
+    isHost = false;
+    showScreen('screenHome');
+};
+
+function clearAll() {
+    clearInterval(timerInterval);
+    listeners.forEach(l => off(l.ref, 'value', l.listener));
+    listeners = [];
+}
+
+// Cleanup on close
+window.addEventListener('beforeunload', ()=>{
+    if (roomCode && myId) remove(ref(db, `rooms/${roomCode}/players/${myId}`));
+});
+
+</script>
 </body>
 </html>
-
