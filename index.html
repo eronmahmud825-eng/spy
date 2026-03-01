@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🕵️ Online Spy Game</title>
+<title>Online Spy Game</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -14,23 +14,31 @@
 
 <div id="home">
 <input id="name" placeholder="ناوی خۆت">
+
 <button onclick="createRoom()">🎮 دروستکردنی Room</button>
+
 <input id="roomInput" placeholder="Room Code">
 <button onclick="joinRoom()">➡️ چوونە ژوورەوە</button>
 </div>
 
 <div id="room" class="hidden">
 <h3 id="roomCodeText"></h3>
+
+<div id="settings" class="hidden">
+<input type="number" id="spyCount" min="1" max="3" value="1" placeholder="ژمارەی جاسوس">
+<input type="number" id="minutes" min="1" max="20" value="5" placeholder="کات (خولەک)">
+</div>
+
 <div id="players"></div>
+
 <button id="startBtn" onclick="startGame()">🚀 دەستپێکردن</button>
 </div>
 
 <div id="game" class="hidden">
 <div id="timer"></div>
 <div class="card" id="roleCard"></div>
-<div id="voting"></div>
 <div id="result"></div>
-<button id="restartBtn" onclick="restartGame()" class="hidden">🔄 یاری نوێ</button>
+<button onclick="location.reload()">🔄 یاری نوێ</button>
 </div>
 
 </div>
