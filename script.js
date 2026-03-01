@@ -1,182 +1,193 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getDatabase, ref, set, push, onValue, update, get }
-from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-
+// ================= FIREBASE =================
 const firebaseConfig = {
   apiKey: "AIzaSyAzpQ9kpRs9syqFJkL4khpJg-f8Hf3rQi8",
   authDomain: "spygames-c2744.firebaseapp.com",
   databaseURL: "https://spygames-c2744-default-rtdb.firebaseio.com",
-  projectId: "spygames-c2744",
-  storageBucket: "spygames-c2744.appspot.com",
-  messagingSenderId: "508332573335",
-  appId: "1:508332573335:web:2893d35f1c0b25e81e9fd2"
+  projectId: "spygames-c2744"
 };
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 
 let roomCode="";
-let playerId="";
-let playerName="";
-let isHost=false;
+let onlineMode=false;
+let myName="";
 
-const words = [{
-        category: "شار/ووڵات",
-        hint2: "شوێنێکی ناسراو",
-        items: [
-            "سلێمانی", "هەولێر", "دهۆک", "کرکوک", "کووردستان", "کەنەدا", "ئەمەریکا",
-            "نیۆڕک", "لەندەن", "ئاکرێ", "ئەرجەنتین", "فەرەنسا", "پاریس", "ئیسپانیا",
-            "ئیتالیا", "ئالمانیا", "تورکیا", "ئێران", "ژاپۆن"
-        ]
-    },
-    {
-        category: "خواردن",
-        hint2: "خواردنێکی ناسراو",
-        items: [
-            "کەباب", "پیتزا", "بەریانی", "دۆنەر", "ماسی", "برنج", "یاپراخ", "شفتە",
-            "کفتە", "مریشک", "گۆشت", "سووپ", "هەمبەرگەر", "پاستا", "ساندویچ"
-        ]
-    },
-    {
-        category: "سۆشیال میدیا",
-        hint2: "پلاتفۆرمی ئینتەرنێت",
-        items: [
-            "یوتوب", "تیکتۆک", "فەیسبووک", "ئینستاگرام", "ئێکس", "تویچ", "سناپ",
-            "دیسکۆرد", "چاتجیپیتی", "جیمینی", "کڵاود ئەی ئای", "واتساپ", "تێلێگرام"
-        ]
-    },
-    {
-        category: "ئاژەڵ",
-        hint2: "زیندووی وشک",
-        items: [
-            "سەگ", "پشیلە", "مانگا", "مار", "گوورگ", "شێر", "بزن", "کەر", "مەیموون",
-            "ووشتر", "کۆتر", "قاز", "ماسی", "نەهەنگ", "زەرافە", "فیل"
-        ]
-    },
-    {
-        category: "بێگیان/شت",
-        hint2: "شتێکی ڕۆژانە",
-        items: [
-            "کورسی", "فڕن", "قەنەفە", "زۆپا", "سەیارە", "تەیارە", "مۆبایل",
-            "تەلەفزیۆن", "جادە", "بەلەم", "بەرد", "تەناف", "جل", "کاتژمێر", "کەرت"
-        ]
-    }
+// ================= DOM =================
+const setup = document.getElementById("setup");
+const game = document.getElementById("game");
+
+const playersInput = document.getElementById("players");
+const spiesInput = document.getElementById("spies");
+const minutesInput = document.getElementById("minutes");
+
+const timerEl = document.getElementById("timer");
+const playerText = document.getElementById("playerText");
+const showBtn = document.getElementById("showBtn");
+const result = document.getElementById("result");
+const nextBtn = document.getElementById("nextBtn");
+
+const voting = document.getElementById("voting");
+const finalResult = document.getElementById("finalResult");
+const restartBtn = document.getElementById("restartBtn");
+
+// ================= WORDS =================
+const words = [
+{category:"شار",hint2:"شوێنێکی ناسراو",items:["سلێمانی","هەولێر","دهۆک","کرکوک"]},
+{category:"خواردن",hint2:"خواردنێکی ناسراو",items:["کەباب","پیتزا","بەریانی"]},
+{category:"ئاژەڵ",hint2:"زیندوو",items:["سەگ","پشیلە","شێر"]}
 ];
 
-function randomCode(){
+// ================= STATE =================
+let totalPlayers=0;
+let spyCount=0;
+let time=0;
+let currentPlayer=1;
+let spies=[];
+let secret=null;
+let timerInterval=null;
+
+// ================= ONLINE =================
+function randomRoom(){
 return Math.floor(1000+Math.random()*9000).toString();
 }
 
-window.createRoom=async function(){
-playerName=document.getElementById("name").value;
-if(!playerName) return alert("ناو بنووسە");
+function createRoom(){
+myName=document.getElementById("playerName").value;
+if(!myName) return alert("Enter Name");
 
-roomCode=randomCode();
-playerId=push(ref(db,"rooms/"+roomCode+"/players")).key;
-isHost=true;
+roomCode=randomRoom();
+onlineMode=true;
 
-await set(ref(db,"rooms/"+roomCode),{state:"waiting"});
-await set(ref(db,"rooms/"+roomCode+"/players/"+playerId),{name:playerName});
+db.ref("rooms/"+roomCode).set({status:"waiting"});
+db.ref("rooms/"+roomCode+"/players").push({name:myName});
 
-enterRoom();
+alert("Room Code: "+roomCode);
+listenRoom();
 }
 
-window.joinRoom=async function(){
-playerName=document.getElementById("name").value;
-roomCode=document.getElementById("roomInput").value;
-if(!playerName||!roomCode) return alert("زانیاری تەواو بکە");
+function joinRoom(){
+myName=document.getElementById("playerName").value;
+roomCode=document.getElementById("roomCodeInput").value;
 
-playerId=push(ref(db,"rooms/"+roomCode+"/players")).key;
-await set(ref(db,"rooms/"+roomCode+"/players/"+playerId),{name:playerName});
+if(!myName||!roomCode) return alert("Fill all");
 
-enterRoom();
+onlineMode=true;
+db.ref("rooms/"+roomCode+"/players").push({name:myName});
+listenRoom();
 }
 
-function enterRoom(){
-document.getElementById("home").classList.add("hidden");
-document.getElementById("room").classList.remove("hidden");
-document.getElementById("roomCodeText").innerText="Room Code: "+roomCode;
-
-if(isHost){
-document.getElementById("settings").classList.remove("hidden");
-}
-
-onValue(ref(db,"rooms/"+roomCode+"/players"),snap=>{
+function listenRoom(){
+db.ref("rooms/"+roomCode).on("value",(snap)=>{
 const data=snap.val();
-let html="";
-for(let id in data){
-html+=`<div class="card">${data[id].name}</div>`;
-}
-document.getElementById("players").innerHTML=html;
+if(!data) return;
+
+if(data.status==="start") startGame(true);
+if(data.status==="voting") startVoting();
 });
 }
 
-window.startGame=async function(){
-if(!isHost) return alert("تەنها Host");
+// ================= GAME =================
+function startGame(auto=false){
 
-const spyCount=parseInt(document.getElementById("spyCount").value);
-const minutes=parseInt(document.getElementById("minutes").value);
+if(!auto && onlineMode){
+db.ref("rooms/"+roomCode).update({status:"start"});
+}
 
-const snap=await get(ref(db,"rooms/"+roomCode+"/players"));
-const players=snap.val();
-const ids=Object.keys(players);
+totalPlayers=Number(playersInput.value);
+spyCount=Number(spiesInput.value);
+time=Number(minutesInput.value)*60;
 
-const chosenWord=words[Math.floor(Math.random()*words.length)];
+currentPlayer=1;
+spies=[];
 
-let spies=[];
 while(spies.length<spyCount){
-let r=ids[Math.floor(Math.random()*ids.length)];
+let r=Math.floor(Math.random()*totalPlayers)+1;
 if(!spies.includes(r)) spies.push(r);
 }
 
-ids.forEach(id=>{
-if(spies.includes(id)){
-update(ref(db,"rooms/"+roomCode+"/players/"+id),{
-role:"spy"
-});
-}else{
-update(ref(db,"rooms/"+roomCode+"/players/"+id),{
-role:"normal",
-word:chosenWord
-});
-}
-});
+const g=words[Math.floor(Math.random()*words.length)];
+const w=g.items[Math.floor(Math.random()*g.items.length)];
+secret={word:w,category:g.category,hint2:g.hint2};
 
-update(ref(db,"rooms/"+roomCode),{
-state:"playing",
-endTime:Date.now()+minutes*60000
-});
+setup.style.display="none";
+game.style.display="block";
+
+updateTimer();
+playerText.innerText="Player 1 Click Show";
 }
 
-onValue(ref(db,"rooms/"+roomCode),snap=>{
-if(!snap.exists()) return;
-const data=snap.val();
-
-if(data.state==="playing"){
-document.getElementById("room").classList.add("hidden");
-document.getElementById("game").classList.remove("hidden");
-startTimer(data.endTime);
+function updateTimer(){
+const m=String(Math.floor(time/60)).padStart(2,"0");
+const s=String(time%60).padStart(2,"0");
+timerEl.innerText=`${m}:${s}`;
 }
-});
 
-onValue(ref(db,"rooms/"+roomCode+"/players/"+playerId),snap=>{
-if(!snap.exists()) return;
-const data=snap.val();
-if(data.role==="spy"){
-document.getElementById("roleCard").innerHTML="🕵️ تۆ جاسوسی";
-}
-if(data.role==="normal"){
-document.getElementById("roleCard").innerHTML="📌 وشە: "+data.word;
-}
-});
-
-function startTimer(endTime){
-const interval=setInterval(()=>{
-let left=Math.floor((endTime-Date.now())/1000);
-document.getElementById("timer").innerText="⏳ "+left+"s";
-if(left<=0){
-clearInterval(interval);
-document.getElementById("result").innerText="⏰ کات تەواو بوو";
+function startTimer(){
+timerInterval=setInterval(()=>{
+time--;
+updateTimer();
+if(time<=0){
+clearInterval(timerInterval);
+startVoting();
 }
 },1000);
+}
+
+function showRole(){
+result.innerHTML="";
+showBtn.disabled=true;
+
+if(spies.includes(currentPlayer)){
+result.innerHTML=`🕵️ Spy<br>Category: ${secret.category}`;
+result.className="spy";
+}else{
+result.innerHTML=`📌 Word: ${secret.word}`;
+result.className="normal";
+}
+
+nextBtn.style.display="block";
+}
+
+function nextPlayer(){
+result.innerHTML="";
+showBtn.disabled=false;
+nextBtn.style.display="none";
+currentPlayer++;
+
+if(currentPlayer<=totalPlayers){
+playerText.innerText=`Player ${currentPlayer} Click Show`;
+}else{
+playerText.innerText="Game Started";
+startTimer();
+}
+}
+
+function startVoting(){
+
+if(onlineMode){
+db.ref("rooms/"+roomCode).update({status:"voting"});
+}
+
+clearInterval(timerInterval);
+voting.innerHTML="<h3>Who is Spy?</h3>";
+
+for(let i=1;i<=totalPlayers;i++){
+const b=document.createElement("button");
+b.innerText="Player "+i;
+b.onclick=()=>vote(i);
+voting.appendChild(b);
+}
+}
+
+function vote(p){
+voting.innerHTML="";
+finalResult.innerHTML=spies.includes(p)?
+"🎉 Correct! Spy: "+spies.join(","):
+"❌ Wrong! Spy: "+spies.join(",");
+restartBtn.style.display="block";
+}
+
+function restartGame(){
+location.reload();
 }
