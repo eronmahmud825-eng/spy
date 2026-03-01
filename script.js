@@ -75,7 +75,7 @@ roomCode=randomCode();
 playerId=push(ref(db,"rooms/"+roomCode+"/players")).key;
 isHost=true;
 
-await set(ref(db,"rooms/"+roomCode),{gameState:"waiting"});
+await set(ref(db,"rooms/"+roomCode),{state:"waiting"});
 await set(ref(db,"rooms/"+roomCode+"/players/"+playerId),{name:playerName});
 
 enterRoom();
@@ -97,6 +97,10 @@ document.getElementById("home").classList.add("hidden");
 document.getElementById("room").classList.remove("hidden");
 document.getElementById("roomCodeText").innerText="Room Code: "+roomCode;
 
+if(isHost){
+document.getElementById("settings").classList.remove("hidden");
+}
+
 onValue(ref(db,"rooms/"+roomCode+"/players"),snap=>{
 const data=snap.val();
 let html="";
@@ -110,31 +114,69 @@ document.getElementById("players").innerHTML=html;
 window.startGame=async function(){
 if(!isHost) return alert("تەنها Host");
 
+const spyCount=parseInt(document.getElementById("spyCount").value);
+const minutes=parseInt(document.getElementById("minutes").value);
+
 const snap=await get(ref(db,"rooms/"+roomCode+"/players"));
 const players=snap.val();
 const ids=Object.keys(players);
 
-const chosen=words[Math.floor(Math.random()*words.length)];
-const word=chosen.items[Math.floor(Math.random()*chosen.items.length)];
-const spyIndex=Math.floor(Math.random()*ids.length);
+const chosenWord=words[Math.floor(Math.random()*words.length)];
 
-ids.forEach((id,index)=>{
-if(index===spyIndex){
+let spies=[];
+while(spies.length<spyCount){
+let r=ids[Math.floor(Math.random()*ids.length)];
+if(!spies.includes(r)) spies.push(r);
+}
+
+ids.forEach(id=>{
+if(spies.includes(id)){
 update(ref(db,"rooms/"+roomCode+"/players/"+id),{
-role:"spy",
-category:chosen.category
+role:"spy"
 });
 }else{
 update(ref(db,"rooms/"+roomCode+"/players/"+id),{
 role:"normal",
-word:word
+word:chosenWord
 });
 }
 });
 
 update(ref(db,"rooms/"+roomCode),{
-gameState:"playing",
-endTime:Date.now()+300000
+state:"playing",
+endTime:Date.now()+minutes*60000
 });
 }
 
+onValue(ref(db,"rooms/"+roomCode),snap=>{
+if(!snap.exists()) return;
+const data=snap.val();
+
+if(data.state==="playing"){
+document.getElementById("room").classList.add("hidden");
+document.getElementById("game").classList.remove("hidden");
+startTimer(data.endTime);
+}
+});
+
+onValue(ref(db,"rooms/"+roomCode+"/players/"+playerId),snap=>{
+if(!snap.exists()) return;
+const data=snap.val();
+if(data.role==="spy"){
+document.getElementById("roleCard").innerHTML="🕵️ تۆ جاسوسی";
+}
+if(data.role==="normal"){
+document.getElementById("roleCard").innerHTML="📌 وشە: "+data.word;
+}
+});
+
+function startTimer(endTime){
+const interval=setInterval(()=>{
+let left=Math.floor((endTime-Date.now())/1000);
+document.getElementById("timer").innerText="⏳ "+left+"s";
+if(left<=0){
+clearInterval(interval);
+document.getElementById("result").innerText="⏰ کات تەواو بوو";
+}
+},1000);
+}
