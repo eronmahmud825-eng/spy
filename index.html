@@ -1,51 +1,40 @@
 <!DOCTYPE html>
 <html lang="ku">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🕵️ یاری جاسوس</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🕵️ Online Spy Game</title>
+<link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
-    <!-- SETUP -->
-    <div id="setup" class="setup-card">
-        <h1>🕵️ یاری جاسوس</h1>
-        <p class="subtitle">ڕێکخستنەکان دیاری بکە</p>
+<div class="container">
 
-        <label>👥 ژمارەی پلەیەرەکان</label>
-        <input type="number" id="players" min="3" max="20" value="6">
+<h2>🕵️ Online Spy Game</h2>
 
-        <label>🕵️ ژمارەی جاسوسەکان</label>
-        <input type="number" id="spies" min="1" max="5" value="1">
+<div id="home">
+<input id="name" placeholder="ناوی خۆت">
+<button onclick="createRoom()">🎮 دروستکردنی Room</button>
+<input id="roomInput" placeholder="Room Code">
+<button onclick="joinRoom()">➡️ چوونە ژوورەوە</button>
+</div>
 
-        <label>⏱️ ماوە (خولەک)</label>
-        <input type="number" id="minutes" min="1" max="20" value="5">
+<div id="room" class="hidden">
+<h3 id="roomCodeText"></h3>
+<div id="players"></div>
+<button id="startBtn" onclick="startGame()">🚀 دەستپێکردن</button>
+</div>
 
-        <button onclick="startGame()">🚀 دەستپێکردنی یاری</button>
-    </div>
+<div id="game" class="hidden">
+<div id="timer"></div>
+<div class="card" id="roleCard"></div>
+<div id="voting"></div>
+<div id="result"></div>
+<button id="restartBtn" onclick="restartGame()" class="hidden">🔄 یاری نوێ</button>
+</div>
 
-    <!-- GAME -->
-    <div id="game" style="display:none" class="game-card">
-        <div id="timer">⏱️ 00:00</div>
-        <h2 id="playerText"></h2>
+</div>
 
-        <button id="showBtn" onclick="showRole()">👁️ پیشاندانی ڕۆڵ</button>
-        <div id="result"></div>
-
-        <button id="nextBtn" onclick="nextPlayer()" style="display:none;">➡️ پلەیەری داهاتوو</button>
-
-        <div id="voting"></div>
-        <div id="finalResult"></div>
-
-        <button id="restartBtn" onclick="restartGame()" style="display:none;">🔄 یاری نوێ</button>
-        <button id="backBtn" onclick="backToSetup()" style="display:none;">⚙️ گەڕانەوە بۆ ڕێکخستن</button>
-    </div>
-
-    <script src="script.js"></script>
+<script type="module" src="script.js"></script>
 </body>
-
 </html>
-
