@@ -5,641 +5,751 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🕵️ یاری جاسوس - ئۆنلاین</title>
     <style>
-        * { box-sizing: border-box; font-family: system-ui, sans-serif; }
+        * { box-sizing: border-box; font-family: system-ui, sans-serif; margin: 0; padding: 0; }
         body {
-            margin: 0;
             background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-            min-height: 100vh;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            min-height: 100vh; color: white;
+            display: flex; align-items: flex-start; justify-content: center;
+            padding: 20px 0 40px;
         }
-        .screen { display: none; max-width: 440px; width: 100%; padding: 24px; }
-        .screen.active { display: block; }
+        .wrap { max-width: 430px; width: 100%; padding: 0 16px; }
         .card {
             background: rgba(255,255,255,0.07);
             border: 1px solid rgba(255,255,255,0.15);
-            border-radius: 24px;
-            padding: 28px 24px;
+            border-radius: 24px; padding: 26px 22px;
             backdrop-filter: blur(12px);
         }
-        h1 { font-size: 2rem; margin: 0 0 6px; }
-        .subtitle { color: #aaa; margin: 0 0 24px; }
-        label { display: block; margin-top: 14px; margin-bottom: 4px; text-align: right; font-size: 14px; color: #ccc; }
-        input[type=number], input[type=text] {
-            width: 100%; padding: 13px 16px; border-radius: 12px;
+        .screen { display: none; }
+        .screen.active { display: block; }
+        h1 { font-size: 2rem; margin-bottom: 4px; }
+        h2 { font-size: 1.4rem; margin-bottom: 14px; }
+        h3 { font-size: 1.1rem; margin-bottom: 10px; }
+        .sub { color: #aaa; font-size: 14px; margin-bottom: 20px; }
+        label { display: block; margin: 14px 0 5px; font-size: 13px; color: #ccc; text-align: right; }
+        input {
+            width: 100%; padding: 13px 15px; border-radius: 12px;
             border: 1px solid rgba(255,255,255,0.2);
-            background: rgba(255,255,255,0.1);
-            color: white; font-size: 16px; outline: none;
+            background: rgba(255,255,255,0.1); color: white;
+            font-size: 16px; outline: none; transition: border 0.2s;
         }
-        input::placeholder { color: rgba(255,255,255,0.4); }
+        input:focus { border-color: #667eea; }
+        input::placeholder { color: rgba(255,255,255,0.35); }
         button {
-            width: 100%; margin-top: 14px; padding: 15px;
-            border: none; border-radius: 16px; font-size: 16px;
+            width: 100%; margin-top: 12px; padding: 15px;
+            border: none; border-radius: 16px; font-size: 15px;
             font-weight: bold; cursor: pointer; transition: transform 0.1s, opacity 0.2s;
         }
         button:active { transform: scale(0.97); }
-        button:disabled { opacity: 0.4; cursor: not-allowed; }
-        .btn-primary { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
-        .btn-success { background: linear-gradient(135deg, #11998e, #38ef7d); color: #111; }
-        .btn-danger { background: linear-gradient(135deg, #eb3349, #f45c43); color: white; }
-        .btn-warn { background: linear-gradient(135deg, #f7971e, #ffd200); color: #111; }
-        .btn-grey { background: rgba(255,255,255,0.15); color: white; }
-        .room-code {
-            font-size: 3rem; font-weight: 900; letter-spacing: 10px;
-            text-align: center; color: #ffd200; padding: 16px 0;
-            cursor: pointer; user-select: all;
-        }
-        .room-code-label { text-align: center; color: #aaa; font-size: 13px; margin-top: -10px; }
-        .players-list { margin-top: 16px; }
-        .player-item {
-            background: rgba(255,255,255,0.08);
-            border-radius: 12px; padding: 12px 16px;
-            margin-bottom: 8px; display: flex;
-            align-items: center; justify-content: space-between;
-            font-size: 15px;
-        }
-        .player-item .dot { width: 10px; height: 10px; border-radius: 50%; background: #38ef7d; }
-        .player-host-badge {
-            font-size: 11px; background: #667eea;
-            padding: 2px 8px; border-radius: 8px; color: white;
-        }
-        #timer {
-            font-size: 2.5rem; font-weight: 900; text-align: center;
-            padding: 14px; border-radius: 16px;
-            background: rgba(255,255,255,0.07);
-            margin-bottom: 14px; letter-spacing: 3px;
-        }
-        #timer.danger { color: #f45c43; animation: pulse 1s infinite; }
-        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
-        .role-card {
-            padding: 24px; border-radius: 20px; text-align: center;
-            font-size: 1.1rem; margin: 16px 0; line-height: 1.8;
-        }
-        .role-card.spy { background: linear-gradient(135deg, #eb3349, #f45c43); }
-        .role-card.normal { background: linear-gradient(135deg, #11998e, #38ef7d); color: #111; }
-        .role-card .big { font-size: 1.6rem; font-weight: 900; display: block; margin-top: 6px; }
-        .vote-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
-        .vote-btn {
-            margin: 0; padding: 14px 10px; border-radius: 14px;
-            background: rgba(255,193,7,0.2); border: 2px solid #ffc107;
-            color: #ffd200; font-size: 15px; font-weight: bold;
-        }
-        .vote-btn:hover { background: rgba(255,193,7,0.4); }
-        .final-result {
-            padding: 20px; border-radius: 20px; text-align: center;
-            font-size: 1.2rem; margin: 14px 0;
-        }
-        .final-result.win { background: linear-gradient(135deg, #11998e33, #38ef7d33); border: 2px solid #38ef7d; }
-        .final-result.lose { background: linear-gradient(135deg, #eb334933, #f45c4333); border: 2px solid #f45c43; }
-        .status-msg { text-align: center; color: #aaa; font-size: 14px; margin: 10px 0; }
-        .divider { height: 1px; background: rgba(255,255,255,0.1); margin: 18px 0; }
+        button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important; }
+        .btn-blue   { background: linear-gradient(135deg,#667eea,#764ba2); color: #fff; }
+        .btn-green  { background: linear-gradient(135deg,#11998e,#38ef7d); color: #111; }
+        .btn-red    { background: linear-gradient(135deg,#eb3349,#f45c43); color: #fff; }
+        .btn-yellow { background: linear-gradient(135deg,#f7971e,#ffd200); color: #111; }
+        .btn-grey   { background: rgba(255,255,255,0.12); color: #ddd; }
         .tabs { display: flex; gap: 8px; margin-bottom: 18px; }
         .tab {
             flex: 1; padding: 11px; border-radius: 12px; border: none;
-            background: rgba(255,255,255,0.08); color: #aaa;
-            font-size: 14px; font-weight: bold; cursor: pointer; margin: 0;
-            transition: all 0.2s;
+            background: rgba(255,255,255,0.07); color: #888;
+            font-size: 14px; font-weight: bold; cursor: pointer; margin: 0; transition: all 0.2s;
         }
-        .tab.active { background: rgba(102,126,234,0.4); color: white; border: 1px solid #667eea; }
-        .hint-banner {
+        .tab.on { background: rgba(102,126,234,0.35); color: #fff; border: 1px solid #667eea; }
+        .divider { height: 1px; background: rgba(255,255,255,0.1); margin: 18px 0; }
+        .code-box {
+            font-size: 3rem; font-weight: 900; letter-spacing: 10px;
+            text-align: center; color: #ffd200; padding: 14px 0;
+            cursor: pointer; user-select: all;
+        }
+        .code-hint { text-align: center; color: #aaa; font-size: 12px; margin-bottom: 6px; }
+        .copy-ok { text-align: center; color: #38ef7d; font-size: 12px; height: 16px; }
+        .p-item {
+            display: flex; align-items: center; gap: 10px;
+            background: rgba(255,255,255,0.07); border-radius: 12px;
+            padding: 12px 15px; margin-bottom: 8px; font-size: 15px;
+        }
+        .dot { width: 9px; height: 9px; border-radius: 50%; background: #38ef7d; flex-shrink: 0; }
+        .badge {
+            font-size: 10px; background: #667eea;
+            padding: 2px 7px; border-radius: 8px; color: #fff;
+        }
+        #timer {
+            font-size: 2.6rem; font-weight: 900; text-align: center;
+            padding: 12px; border-radius: 16px;
+            background: rgba(255,255,255,0.07); letter-spacing: 3px; margin-bottom: 12px;
+        }
+        #timer.red { color: #f45c43; animation: blink 1s infinite; }
+        @keyframes blink { 50%{opacity:0.4} }
+        .role-box {
+            border-radius: 20px; padding: 22px 18px; text-align: center;
+            font-size: 1rem; margin: 12px 0; line-height: 2;
+        }
+        .role-box.spy    { background: linear-gradient(135deg,#eb3349,#f45c43); }
+        .role-box.normal { background: linear-gradient(135deg,#11998e,#38ef7d); color: #111; }
+        .role-box .big   { font-size: 1.6rem; font-weight: 900; display: block; }
+        .hint-box {
             background: rgba(255,193,7,0.15); border: 1px solid #ffc107;
-            border-radius: 14px; padding: 14px; text-align: center;
-            font-size: 15px; margin: 12px 0;
+            border-radius: 14px; padding: 12px 16px; text-align: center;
+            font-size: 14px; margin-bottom: 12px;
         }
-        .waiting-dots::after {
-            content: '...';
-            animation: dots 1.2s steps(4,end) infinite;
+        .vote-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-top: 12px; }
+        .vote-btn {
+            margin: 0; padding: 13px 8px; border-radius: 14px;
+            background: rgba(255,193,7,0.15); border: 2px solid #ffc107;
+            color: #ffd200; font-size: 14px; font-weight: bold;
         }
-        @keyframes dots {
-            0%,20%{content:'.'} 40%{content:'..'} 60%,100%{content:'...'}
+        .result-box {
+            border-radius: 20px; padding: 20px 16px; text-align: center;
+            font-size: 1.1rem; margin: 14px 0; line-height: 1.8;
         }
-        .error-msg { color: #f45c43; text-align: center; margin-top: 8px; font-size: 14px; }
-        #copyNotice { font-size:12px; color:#38ef7d; text-align:center; height:16px; }
+        .result-box.win  { background: rgba(56,239,125,0.12); border: 2px solid #38ef7d; }
+        .result-box.lose { background: rgba(244,92,67,0.12);  border: 2px solid #f45c43; }
+        .status { text-align: center; color: #aaa; font-size: 13px; margin: 10px 0; }
+        .err { color: #f45c43; text-align: center; margin-top: 10px; font-size: 14px; min-height: 20px; }
+        /* Firebase setup guide */
+        .guide-step {
+            background: rgba(255,255,255,0.05); border-radius: 14px;
+            padding: 14px 16px; margin-bottom: 10px; font-size: 13px; line-height: 1.7;
+        }
+        .guide-step .num {
+            display: inline-block; background: #667eea; color: #fff;
+            border-radius: 50%; width: 22px; height: 22px; text-align: center;
+            line-height: 22px; font-size: 12px; font-weight: bold; margin-left: 6px;
+        }
+        .code-snippet {
+            background: #111; border-radius: 8px; padding: 10px 14px;
+            font-family: monospace; font-size: 13px; color: #38ef7d;
+            margin-top: 8px; white-space: pre; overflow-x: auto;
+        }
+        .connecting { text-align: center; padding: 30px; color: #aaa; }
+        .spinner {
+            width: 36px; height: 36px; border: 3px solid rgba(255,255,255,0.1);
+            border-top-color: #667eea; border-radius: 50%;
+            animation: spin 0.8s linear infinite; margin: 0 auto 14px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .db-status { padding: 8px 14px; border-radius: 10px; font-size: 13px; text-align: center; margin-bottom: 14px; }
+        .db-ok   { background: rgba(56,239,125,0.15); border: 1px solid #38ef7d; color: #38ef7d; }
+        .db-fail { background: rgba(244,92,67,0.15);  border: 1px solid #f45c43; color: #f45c43; }
+        .db-wait { background: rgba(255,193,7,0.15);  border: 1px solid #ffc107; color: #ffd200; }
     </style>
 </head>
 <body>
+<div class="wrap">
 
-<!-- ===== SCREEN 1: HOME ===== -->
-<div class="screen active" id="screenHome">
+<!-- ===== SCREEN: CHECKING DB ===== -->
+<div class="screen active" id="scCheck">
+    <div class="card connecting">
+        <div class="spinner"></div>
+        <p>پەیوەندی بە Firebase...</p>
+        <p style="font-size:12px;color:#666;margin-top:8px">تکایە چاوەڕوان بە</p>
+    </div>
+</div>
+
+<!-- ===== SCREEN: FIREBASE SETUP GUIDE ===== -->
+<div class="screen" id="scSetup">
+    <div class="card">
+        <h2>⚠️ Firebase ڕێکنەخراوە</h2>
+        <p class="sub">تکایە ئەم هەنگاوانە بەجێبهێنە بۆ چالاک کردنی یاری ئۆنلاین</p>
+
+        <div class="guide-step">
+            <span class="num">1</span> <b>بچوو بۆ Firebase Console</b><br>
+            <a href="https://console.firebase.google.com/project/spygames-c2744" target="_blank"
+               style="color:#667eea">console.firebase.google.com/project/spygames-c2744</a>
+        </div>
+
+        <div class="guide-step">
+            <span class="num">2</span> <b>Realtime Database دروست بکە</b><br>
+            لە لیستی چەپ کرتە بکە: <b>Build → Realtime Database</b><br>
+            دوای ئەوە کرتەی <b>"Create Database"</b> بکە<br>
+            ناوچەی: <b>United States</b> هەڵبژێرە<br>
+            Mode: <b>Test Mode</b> هەڵبژێرە
+        </div>
+
+        <div class="guide-step">
+            <span class="num">3</span> <b>قانوونەکانی ئازادانە دابنێ</b><br>
+            لە ناو Realtime Database کرتەی <b>Rules</b> بکە، ئەم کۆدەی خوارەوەی تێدا بنووسە:
+            <div class="code-snippet">{
+  "rules": {
+    ".read": true,
+    ".write": true
+  }
+}</div>
+            دوای ئەوە <b>Publish</b> بکە
+        </div>
+
+        <div class="guide-step">
+            <span class="num">4</span> <b>databaseURL زیاد بکە</b><br>
+            لە ناو Project Settings دابمەزرێنە، URL ی database copy بکە وەک:
+            <div class="code-snippet">https://spygames-c2744-default-rtdb.firebaseio.com</div>
+        </div>
+
+        <button class="btn-blue" onclick="retryConnect()">🔄 دووبارە هەوڵبدەوە</button>
+        <div id="setupErr" class="err"></div>
+    </div>
+</div>
+
+<!-- ===== SCREEN: HOME ===== -->
+<div class="screen" id="scHome">
     <div class="card">
         <h1>🕵️ یاری جاسوس</h1>
-        <p class="subtitle">یاری ئۆنلاین بەشێو گروپ</p>
+        <p class="sub">ئۆنلاین — بەشداربوونی هاوڕێکانت</p>
+        <div id="dbStatusBadge" class="db-status db-ok">✅ Firebase پەیوەست بووە</div>
         <div class="tabs">
-            <button class="tab active" onclick="showTab('create')">🆕 دروستکردن</button>
-            <button class="tab" onclick="showTab('join')">🔗 بەشداربوون</button>
+            <button class="tab on" onclick="showTab('create')">🆕 دروستکردن</button>
+            <button class="tab"    onclick="showTab('join')">🔗 بەشداربوون</button>
         </div>
-        <!-- Create Room -->
+
         <div id="tabCreate">
             <label>👤 ناوت</label>
-            <input type="text" id="createName" placeholder="ناوت بنووسە" maxlength="16">
+            <input type="text" id="cName" placeholder="ناوت بنووسە" maxlength="14">
             <label>👥 ژمارەی پلەیەرەکان</label>
-            <input type="number" id="createPlayers" min="3" max="20" value="6">
+            <input type="number" id="cPlayers" min="2" max="20" value="6">
             <label>🕵️ ژمارەی جاسوسەکان</label>
-            <input type="number" id="createSpies" min="1" max="5" value="1">
+            <input type="number" id="cSpies" min="1" max="5" value="1">
             <label>⏱️ ماوە (خولەک)</label>
-            <input type="number" id="createMinutes" min="1" max="20" value="5">
-            <button class="btn-primary" onclick="createRoom()">🚀 دروستکردنی ژووری نوێ</button>
+            <input type="number" id="cMins" min="1" max="20" value="5">
+            <button class="btn-blue" onclick="createRoom()">🚀 دروستکردنی ژوور</button>
         </div>
-        <!-- Join Room -->
+
         <div id="tabJoin" style="display:none">
             <label>👤 ناوت</label>
-            <input type="text" id="joinName" placeholder="ناوت بنووسە" maxlength="16">
-            <label>🔑 کۆدی ژوور</label>
-            <input type="text" id="joinCode" placeholder="مەسەلەن: AB12" maxlength="4" style="letter-spacing:6px;text-align:center;font-size:1.4rem;font-weight:900;text-transform:uppercase">
-            <button class="btn-success" onclick="joinRoom()">🔗 بەشداربوون</button>
+            <input type="text" id="jName" placeholder="ناوت بنووسە" maxlength="14">
+            <label>🔑 کۆدی ژوور (4 پیت)</label>
+            <input type="text" id="jCode" placeholder="AB12" maxlength="4"
+                   style="letter-spacing:8px;text-align:center;font-size:1.8rem;font-weight:900;text-transform:uppercase"
+                   oninput="this.value=this.value.toUpperCase()">
+            <button class="btn-green" onclick="joinRoom()">🔗 بەشداربوون</button>
         </div>
-        <div id="homeError" class="error-msg"></div>
+        <div id="homeErr" class="err"></div>
     </div>
 </div>
 
-<!-- ===== SCREEN 2: LOBBY ===== -->
-<div class="screen" id="screenLobby">
+<!-- ===== SCREEN: LOBBY ===== -->
+<div class="screen" id="scLobby">
     <div class="card">
-        <h1>🏠 ژووری چاوەڕوان</h1>
-        <p class="room-code" id="lobbyCode" onclick="copyCode()" title="کرتە بکە بۆ کۆپی">----</p>
-        <p class="room-code-label">کۆدی ژوور — کرتە بکە بۆ کۆپی</p>
-        <div id="copyNotice"></div>
+        <h2>🏠 ژووری چاوەڕوان</h2>
+        <p class="code-box" id="lobCode" onclick="copyCode()">----</p>
+        <p class="code-hint">⬆️ کرتە بکەرەوە بۆ کۆپی کردنی کۆد</p>
+        <div class="copy-ok" id="copyOk"></div>
         <div class="divider"></div>
-        <p style="color:#aaa;font-size:13px;margin:0 0 10px">
-            پلەیەرەکان بەشداربوون: <span id="joinedCount">1</span> / <span id="neededCount">6</span>
-        </p>
-        <div class="players-list" id="lobbyPlayers"></div>
+        <p class="status">پلەیەرەکان: <b id="lobJoined">1</b> / <b id="lobNeeded">6</b></p>
+        <div id="lobPlayers"></div>
         <div class="divider"></div>
-        <div id="startArea">
-            <button class="btn-success" id="startBtn" onclick="hostStartGame()" style="display:none">
-                ▶️ دەستپێکردنی یاری
-            </button>
-            <p class="status-msg waiting-dots" id="waitMsg">چاوەڕوانی بۆ دەستپێکردنی هۆستەکە</p>
-        </div>
-        <button class="btn-grey" onclick="leaveRoom()" style="margin-top:6px">🚪 چوونەدەرەوە</button>
+        <button class="btn-green" id="lobStartBtn" onclick="hostStart()" style="display:none">▶️ دەستپێکردنی یاری</button>
+        <p class="status" id="lobWait">⏳ چاوەڕوانی هۆستەکە...</p>
+        <button class="btn-grey" onclick="leaveRoom()" style="margin-top:8px">🚪 چوونەدەرەوە</button>
+        <div id="lobErr" class="err"></div>
     </div>
 </div>
 
-<!-- ===== SCREEN 3: ROLE REVEAL ===== -->
-<div class="screen" id="screenRole">
+<!-- ===== SCREEN: ROLE REVEAL ===== -->
+<div class="screen" id="scReveal">
     <div class="card" style="text-align:center">
-        <h2 id="rolePlayerName">پلەیەری ...</h2>
-        <p style="color:#aaa;font-size:14px">کرتە بکە بۆ دیتنی ڕۆڵەکەت</p>
-        <button class="btn-primary" id="revealBtn" onclick="revealRole()">👁️ پیشاندانی ڕۆڵ</button>
-        <div id="roleResult" style="display:none"></div>
-        <div id="roleReady" style="display:none">
+        <h2 id="rvName">...</h2>
+        <p class="sub">دەکەوتەرەوە بۆ دیتنی ڕۆڵت — تەنها تۆ ببینە!</p>
+        <button class="btn-blue" id="rvBtn" onclick="doReveal()">👁️ پیشاندانی ڕۆڵ</button>
+        <div id="rvResult" style="display:none;margin-top:14px"></div>
+        <div id="rvReady" style="display:none">
             <div class="divider"></div>
-            <p class="status-msg">پلەیەری داهاتوو چاوەڕوانە</p>
-            <p class="status-msg" id="readyCount"></p>
+            <p class="status">✅ ئامادەی — چاوەڕوانی هاوڕێکانت</p>
+            <p class="status" id="rvCount" style="font-size:1.1rem;font-weight:bold"></p>
         </div>
     </div>
 </div>
 
-<!-- ===== SCREEN 4: GAME (DISCUSSION) ===== -->
-<div class="screen" id="screenGame">
+<!-- ===== SCREEN: GAME ===== -->
+<div class="screen" id="scGame">
     <div class="card">
         <div id="timer">⏱️ 00:00</div>
-        <div id="gameHint" style="display:none" class="hint-banner"></div>
-        <div class="role-card" id="gameRoleReminder"></div>
+        <div class="hint-box" id="hintBox" style="display:none"></div>
+        <div class="role-box" id="gameRole"></div>
         <div class="divider"></div>
-        <h3 style="text-align:center;margin:0 0 10px">🗳️ جاسوس کێیە؟</h3>
-        <div class="vote-grid" id="voteButtons"></div>
-        <div id="voteStatus" class="status-msg"></div>
+        <h3 style="text-align:center">🗳️ دەنگ بدە — جاسوس کێیە؟</h3>
+        <p class="status" id="voteStatus"></p>
+        <div class="vote-grid" id="voteGrid"></div>
         <div id="gameResult" style="display:none"></div>
-        <div id="gameButtons" style="display:none">
-            <button class="btn-success" onclick="playAgain()">🔄 یاری نوێ</button>
-            <button class="btn-grey" onclick="leaveRoom()" style="margin-top:8px">🏠 گەڕانەوە بۆ دەستپێک</button>
+        <div id="gameEnd" style="display:none;margin-top:10px">
+            <button class="btn-green" onclick="playAgain()">🔄 یاری نوێ (هەمان ژوور)</button>
+            <button class="btn-grey"  onclick="leaveRoom()" style="margin-top:8px">🏠 گەڕانەوە</button>
         </div>
     </div>
 </div>
 
-<!-- Firebase SDKs -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getDatabase, ref, set, get, push, onValue, update, remove, off, serverTimestamp }
-    from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+</div><!-- /wrap -->
 
-const firebaseConfig = {
+<script type="module">
+// ============================================================
+//  FIREBASE IMPORTS
+// ============================================================
+import { initializeApp } from
+    "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+    getDatabase, ref, set, get, onValue, update, remove, off, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const CFG = {
     apiKey: "AIzaSyAzpQ9kpRs9syqFJkL4khpJg-f8Hf3rQi8",
     authDomain: "spygames-c2744.firebaseapp.com",
-    projectId: "spygames-c2744",
     databaseURL: "https://spygames-c2744-default-rtdb.firebaseio.com",
+    projectId: "spygames-c2744",
     storageBucket: "spygames-c2744.firebasestorage.app",
     messagingSenderId: "508332573335",
-    appId: "1:508332573335:web:2893d35f1c0b25e81e9fd2",
-    measurementId: "G-9Z9DTTV668"
+    appId: "1:508332573335:web:2893d35f1c0b25e81e9fd2"
 };
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+let db;
+try {
+    const firebaseApp = initializeApp(CFG);
+    db = getDatabase(firebaseApp);
+} catch(e) {
+    showScreen('scSetup');
+    throw e;
+}
 
-// ====== WORD LIST ======
+// ============================================================
+//  WORDS
+// ============================================================
 const WORDS = [
-    { category: "شار/ووڵات", hint2: "شوێنێکی ناسراو", items: ["سلێمانی","هەولێر","دهۆک","کرکوک","کووردستان","کەنەدا","ئەمەریکا","نیۆڕک","لەندەن","ئاکرێ","پاریس","ئیتالیا","ئالمانیا","تورکیا","ئێران","ژاپۆن"] },
-    { category: "خواردن", hint2: "خواردنێکی ناسراو", items: ["کەباب","پیتزا","بەریانی","دۆنەر","ماسی","برنج","یاپراخ","شفتە","کفتە","مریشک","گۆشت","سووپ","هەمبەرگەر","پاستا","ساندویچ"] },
-    { category: "سۆشیال میدیا", hint2: "پلاتفۆرمی ئینتەرنێت", items: ["یوتوب","تیکتۆک","فەیسبووک","ئینستاگرام","ئێکس","تویچ","سناپ","دیسکۆرد","واتساپ","تێلێگرام"] },
-    { category: "ئاژەڵ", hint2: "زیندووی وشک", items: ["سەگ","پشیلە","مانگا","مار","گوورگ","شێر","بزن","کەر","مەیموون","ووشتر","کۆتر","قاز","نەهەنگ","زەرافە","فیل"] },
-    { category: "بێگیان/شت", hint2: "شتێکی ڕۆژانە", items: ["کورسی","فڕن","قەنەفە","زۆپا","سەیارە","تەیارە","مۆبایل","تەلەفزیۆن","جادە","بەلەم","بەرد","تەناف","جل","کاتژمێر","کەرت"] },
-    { category: "وەرزش", hint2: "چالاکییەکی جەستەیی", items: ["فوتبۆل","بەسکێتبۆل","تێنیس","موی تای","شناکردن","دووخستن","والێبۆل","بۆکس"] }
+    { cat: "شار/ووڵات",   hint: "شوێنێکی ناسراو",   items: ["سلێمانی","هەولێر","دهۆک","کرکوک","کووردستان","کەنەدا","ئەمەریکا","نیۆڕک","لەندەن","پاریس","ئیتالیا","ئالمانیا","تورکیا","ئێران","ژاپۆن","دوبەی","ئەستەنبوول","بارسەلۆنا"] },
+    { cat: "خواردن",       hint: "خواردنێکی ناسراو",  items: ["کەباب","پیتزا","بەریانی","دۆنەر","ماسی","برنج","یاپراخ","شفتە","کفتە","مریشک","گۆشت","سووپ","هەمبەرگەر","پاستا","ساندویچ","لازانیا","سوشی","تاکۆ"] },
+    { cat: "سۆشیال میدیا", hint: "پلاتفۆرمی ئینتەرنێت",items: ["یوتوب","تیکتۆک","فەیسبووک","ئینستاگرام","ئێکس","تویچ","سناپ","دیسکۆرد","واتساپ","تێلێگرام","لینکدین","پینتەرست"] },
+    { cat: "ئاژەڵ",        hint: "زیندووی جیهان",     items: ["سەگ","پشیلە","مانگا","مار","گوورگ","شێر","بزن","کەر","مەیموون","ووشتر","کۆتر","قاز","نەهەنگ","زەرافە","فیل","ئەسپ","ئۆتر","پلەنگ"] },
+    { cat: "بێگیان/شت",   hint: "شتێکی ڕۆژانە",      items: ["کورسی","فڕن","قەنەفە","زۆپا","سەیارە","تەیارە","مۆبایل","تەلەفزیۆن","بەلەم","بەرد","تەناف","جل","کاتژمێر","کەرت","لاپتۆپ","نەتەوەبەند","شەمشێر"] },
+    { cat: "وەرزش",        hint: "چالاکییەکی جەستەیی", items: ["فوتبۆل","بەسکێتبۆل","تێنیس","موی تای","شناکردن","والێبۆل","بۆکس","گۆڵف","کرکێت","بەیسبۆڵ","شەمشێربازی"] },
+    { cat: "فیلم",         hint: "فیلمێکی ناسراو",    items: ["تایتانیک","ئەڤاتار","ئینسێپشن","ئینتەرستێلار","مەتریکس","گودفادەر","یوڵی مار","هاری پۆتەر","باتمان","سوپەرمان"] },
+    { cat: "پیشە",         hint: "کارێکی مرۆڤ",       items: ["دکتۆر","مامۆستا","ئەندازیار","پۆلیس","پەرستار","شۆفێر","کچخانچی","وەرزشکار","کۆمیکان","نووسەر","دیزاینەر"] }
 ];
 
-// ====== STATE ======
-let myId = null;
-let myName = "";
-let roomCode = "";
-let isHost = false;
-let myRole = null; // 'spy' or 'normal'
-let myWord = null;
-let myCategory = null;
-let timerInterval = null;
-let listeners = [];
-let totalPlayersNeeded = 0;
-
-// ====== UTILS ======
-function uid() { return Math.random().toString(36).substr(2,9); }
-
-function genCode() {
-    const c = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-    return Array.from({length:4},()=>c[Math.floor(Math.random()*c.length)]).join('');
-}
-
 function pickSecret() {
-    const g = WORDS[Math.floor(Math.random()*WORDS.length)];
-    const w = g.items[Math.floor(Math.random()*g.items.length)];
-    return { word: w, category: g.category, hint2: g.hint2 };
+    const g = WORDS[Math.floor(Math.random() * WORDS.length)];
+    const w = g.items[Math.floor(Math.random() * g.items.length)];
+    return { word: w, cat: g.cat, hint: g.hint };
 }
 
+// ============================================================
+//  STATE
+// ============================================================
+let myId   = '';
+let myName = '';
+let roomCode = '';
+let isHost = false;
+let myRole = '';
+let myWord = '';
+let myCat  = '';
+let myHint = '';
+let listeners = [];
+let timerInt  = null;
+let totalNeeded = 0;
+let myVoted = false;
+
+// ============================================================
+//  UTILS
+// ============================================================
+function uid() { return Math.random().toString(36).substr(2,9); }
+function genCode() {
+    const c = "ABCDEFGHJKLMNPQRSTUVWXYZ2345679";
+    return [0,0,0,0].map(()=>c[Math.floor(Math.random()*c.length)]).join('');
+}
 function showScreen(id) {
     document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
 }
+function offAll() {
+    listeners.forEach(({r,fn}) => { try{ off(r,'value',fn); }catch(e){} });
+    listeners = [];
+}
 
-function setError(msg) { document.getElementById('homeError').innerText = msg; }
+// ============================================================
+//  DB CONNECTION CHECK
+// ============================================================
+async function checkDB() {
+    try {
+        const testRef = ref(db, '.info/connected');
+        await new Promise((resolve, reject) => {
+            const timeout = setTimeout(() => reject(new Error('timeout')), 8000);
+            const unsub = onValue(testRef, snap => {
+                clearTimeout(timeout);
+                off(testRef, 'value', unsub);
+                if (snap.val() === true) resolve();
+                else reject(new Error('not connected'));
+            }, err => { clearTimeout(timeout); reject(err); });
+        });
+        showScreen('scHome');
+    } catch(e) {
+        console.error('DB check failed:', e);
+        showScreen('scSetup');
+    }
+}
+checkDB();
 
-// ====== TABS ======
+window.retryConnect = function() {
+    document.getElementById('setupErr').innerText = 'پەیوەندی...';
+    showScreen('scCheck');
+    checkDB();
+};
+
+// ============================================================
+//  TABS
+// ============================================================
 window.showTab = function(tab) {
-    document.getElementById('tabCreate').style.display = tab==='create'?'block':'none';
-    document.getElementById('tabJoin').style.display   = tab==='join'?'block':'none';
-    document.querySelectorAll('.tab').forEach((t,i)=>{
-        t.classList.toggle('active', (tab==='create'&&i===0)||(tab==='join'&&i===1));
+    document.getElementById('tabCreate').style.display = tab==='create' ? 'block' : 'none';
+    document.getElementById('tabJoin').style.display   = tab==='join'   ? 'block' : 'none';
+    document.querySelectorAll('.tab').forEach((t,i) => {
+        t.classList.toggle('on', (tab==='create'&&i===0)||(tab==='join'&&i===1));
     });
 };
 
-// ====== CREATE ROOM ======
+// ============================================================
+//  CREATE ROOM
+// ============================================================
 window.createRoom = async function() {
-    const name = document.getElementById('createName').value.trim();
-    const players = Number(document.getElementById('createPlayers').value);
-    const spies = Number(document.getElementById('createSpies').value);
-    const minutes = Number(document.getElementById('createMinutes').value);
+    const name    = document.getElementById('cName').value.trim();
+    const players = +document.getElementById('cPlayers').value;
+    const spies   = +document.getElementById('cSpies').value;
+    const mins    = +document.getElementById('cMins').value;
 
-    if (!name) { setError("ناوت بنووسە!"); return; }
-    setError("");
+    if (!name) { setErr('homeErr','⚠️ ناوت بنووسە'); return; }
+    if (spies >= players) { setErr('homeErr','⚠️ ژمارەی جاسوس زیادە'); return; }
+    setErr('homeErr','');
 
-    myId = uid();
+    myId   = uid();
     myName = name;
     isHost = true;
     roomCode = genCode();
-    totalPlayersNeeded = players;
+    totalNeeded = players;
 
-    const roomRef = ref(db, `rooms/${roomCode}`);
-    await set(roomRef, {
-        host: myId,
-        status: 'lobby',
-        settings: { players, spies, minutes },
-        players: { [myId]: { name, ready: false, host: true } }
-    });
-
-    enterLobby();
+    try {
+        await set(ref(db, `rooms/${roomCode}`), {
+            host: myId,
+            status: 'lobby',
+            settings: { players, spies, mins },
+            players: { [myId]: { name, host: true } }
+        });
+        enterLobby();
+    } catch(e) {
+        setErr('homeErr','❌ هەڵە: ' + e.message);
+    }
 };
 
-// ====== JOIN ROOM ======
+// ============================================================
+//  JOIN ROOM
+// ============================================================
 window.joinRoom = async function() {
-    const name = document.getElementById('joinName').value.trim();
-    const code = document.getElementById('joinCode').value.trim().toUpperCase();
+    const name = document.getElementById('jName').value.trim();
+    const code = document.getElementById('jCode').value.trim().toUpperCase();
 
-    if (!name) { setError("ناوت بنووسە!"); return; }
-    if (!code) { setError("کۆدی ژوور بنووسە!"); return; }
-    setError("");
+    if (!name) { setErr('homeErr','⚠️ ناوت بنووسە'); return; }
+    if (code.length !== 4) { setErr('homeErr','⚠️ کۆدەکە 4 پیت دەبێت'); return; }
+    setErr('homeErr','');
 
-    const roomRef = ref(db, `rooms/${code}`);
-    const snap = await get(roomRef);
+    try {
+        const snap = await get(ref(db, `rooms/${code}`));
+        if (!snap.exists()) { setErr('homeErr','❌ ژوورەکە نەدۆزرایەوە!'); return; }
+        const room = snap.val();
+        if (room.status !== 'lobby') { setErr('homeErr','❌ یاریەکە دەستی پێکردووە!'); return; }
 
-    if (!snap.exists()) { setError("ژوورەکە نەدۆزرایەوە!"); return; }
-    const room = snap.val();
-    if (room.status !== 'lobby') { setError("یاریەکە دەستی پێکردووە!"); return; }
+        myId   = uid();
+        myName = name;
+        isHost = false;
+        roomCode = code;
+        totalNeeded = room.settings.players;
 
-    myId = uid();
-    myName = name;
-    isHost = false;
-    roomCode = code;
-    totalPlayersNeeded = room.settings.players;
-
-    await update(ref(db, `rooms/${roomCode}/players/${myId}`), { name, ready: false, host: false });
-
-    enterLobby();
+        await set(ref(db, `rooms/${roomCode}/players/${myId}`), { name, host: false });
+        enterLobby();
+    } catch(e) {
+        setErr('homeErr','❌ هەڵە: ' + e.message);
+    }
 };
 
-// ====== LOBBY ======
+// ============================================================
+//  LOBBY
+// ============================================================
 function enterLobby() {
-    showScreen('screenLobby');
-    document.getElementById('lobbyCode').innerText = roomCode;
-    document.getElementById('neededCount').innerText = totalPlayersNeeded;
+    offAll();
+    myVoted = false;
+    showScreen('scLobby');
+    document.getElementById('lobCode').innerText = roomCode;
+    document.getElementById('lobNeeded').innerText = totalNeeded;
 
-    // Listen players
+    if (isHost) {
+        document.getElementById('lobStartBtn').style.display = 'block';
+        document.getElementById('lobWait').style.display = 'none';
+    } else {
+        document.getElementById('lobStartBtn').style.display = 'none';
+        document.getElementById('lobWait').style.display = 'block';
+    }
+
+    // Listen players list
     const pRef = ref(db, `rooms/${roomCode}/players`);
-    const pListener = onValue(pRef, snap => {
-        const players = snap.val() || {};
-        const list = Object.entries(players);
-        document.getElementById('joinedCount').innerText = list.length;
-        document.getElementById('neededCount').innerText = totalPlayersNeeded;
-
-        const el = document.getElementById('lobbyPlayers');
+    const pFn  = onValue(pRef, snap => {
+        const pl = snap.val() || {};
+        const arr = Object.entries(pl);
+        document.getElementById('lobJoined').innerText  = arr.length;
+        const el = document.getElementById('lobPlayers');
         el.innerHTML = '';
-        list.forEach(([id, p]) => {
+        arr.forEach(([, p]) => {
             const d = document.createElement('div');
-            d.className = 'player-item';
-            d.innerHTML = `<div style="display:flex;align-items:center;gap:10px">
-                <div class="dot"></div>
-                <span>${p.name}</span>
-                ${p.host ? '<span class="player-host-badge">هۆست</span>' : ''}
-            </div>`;
+            d.className = 'p-item';
+            d.innerHTML = `<div class="dot"></div><span>${p.name}</span>${p.host ? '<span class="badge">هۆست</span>' : ''}`;
             el.appendChild(d);
         });
-
-        if (isHost) {
-            const btn = document.getElementById('startBtn');
-            const msg = document.getElementById('waitMsg');
-            if (list.length >= 2) {
-                btn.style.display = 'block';
-                msg.style.display = 'none';
-            } else {
-                btn.style.display = 'none';
-                msg.style.display = 'block';
-            }
-        }
     });
-    listeners.push({ ref: pRef, listener: pListener });
+    listeners.push({ r: pRef, fn: pFn });
 
-    // Listen game start
-    const gRef = ref(db, `rooms/${roomCode}/status`);
-    const gListener = onValue(gRef, snap => {
-        const status = snap.val();
-        if (status === 'reveal') enterReveal();
-        if (status === 'playing') enterGame();
+    // Listen status
+    const sRef = ref(db, `rooms/${roomCode}/status`);
+    const sFn  = onValue(sRef, snap => {
+        const s = snap.val();
+        if (s === 'reveal')  enterReveal();
+        if (s === 'playing') enterGame();
     });
-    listeners.push({ ref: gRef, listener: gListener });
-
-    if (!isHost) {
-        document.getElementById('startBtn').style.display = 'none';
-        document.getElementById('waitMsg').style.display = 'block';
-    }
+    listeners.push({ r: sRef, fn: sFn });
 }
 
 window.copyCode = function() {
-    navigator.clipboard.writeText(roomCode).then(()=>{
-        const n = document.getElementById('copyNotice');
-        n.innerText = '✅ کۆپی کرا!';
-        setTimeout(()=>n.innerText='',2000);
-    });
+    navigator.clipboard.writeText(roomCode).catch(()=>{});
+    const el = document.getElementById('copyOk');
+    el.innerText = '✅ کۆپی کرا!';
+    setTimeout(() => el.innerText = '', 2000);
 };
 
-// ====== HOST START ======
-window.hostStartGame = async function() {
-    const snap = await get(ref(db, `rooms/${roomCode}`));
-    const room = snap.val();
-    const playerIds = Object.keys(room.players);
-    const settings = room.settings;
-    const spyCount = settings.spies;
+// ============================================================
+//  HOST START
+// ============================================================
+window.hostStart = async function() {
+    try {
+        const snap = await get(ref(db, `rooms/${roomCode}`));
+        const room = snap.val();
+        const pIds = Object.keys(room.players);
+        const spyCnt = room.settings.spies;
 
-    // Assign spies
-    const shuffled = [...playerIds].sort(()=>Math.random()-0.5);
-    const spyIds = shuffled.slice(0, spyCount);
+        const shuffled = [...pIds].sort(() => Math.random() - 0.5);
+        const spyIds   = shuffled.slice(0, spyCnt);
+        const secret   = pickSecret();
 
-    // Pick secret
-    const secret = pickSecret();
+        const roles = {};
+        pIds.forEach(id => { roles[id] = spyIds.includes(id) ? 'spy' : 'normal'; });
 
-    // Assign roles
-    const roles = {};
-    playerIds.forEach(id => {
-        roles[id] = { role: spyIds.includes(id) ? 'spy' : 'normal' };
-    });
-
-    await update(ref(db, `rooms/${roomCode}`), {
-        status: 'reveal',
-        roles,
-        secret,
-        spies: spyIds,
-        readyCount: 0,
-        totalPlayers: playerIds.length,
-        gameStartTime: serverTimestamp(),
-        votedOut: null,
-        result: null
-    });
+        await update(ref(db, `rooms/${roomCode}`), {
+            status:      'reveal',
+            roles,
+            secret,
+            spies:       spyIds,
+            readyCount:  0,
+            totalPlayers: pIds.length,
+            result:      null
+        });
+    } catch(e) {
+        setErr('lobErr', '❌ ' + e.message);
+    }
 };
 
-// ====== REVEAL ======
+// ============================================================
+//  REVEAL
+// ============================================================
 async function enterReveal() {
-    showScreen('screenRole');
+    offAll();
+    showScreen('scReveal');
 
-    // Get my role
-    const roleSnap = await get(ref(db, `rooms/${roomCode}/roles/${myId}`));
-    const secretSnap = await get(ref(db, `rooms/${roomCode}/secret`));
+    document.getElementById('rvName').innerText = `👤 ${myName}`;
+    document.getElementById('rvBtn').disabled    = false;
+    document.getElementById('rvResult').style.display = 'none';
+    document.getElementById('rvReady').style.display  = 'none';
 
-    const roleData = roleSnap.val();
-    const secret = secretSnap.val();
+    try {
+        const rSnap = await get(ref(db, `rooms/${roomCode}/roles/${myId}`));
+        const sSnap = await get(ref(db, `rooms/${roomCode}/secret`));
+        myRole = rSnap.val();
+        const sec = sSnap.val();
+        myWord = sec.word;
+        myCat  = sec.cat;
+        myHint = sec.hint;
+    } catch(e) { console.error(e); }
 
-    myRole = roleData.role;
-    myWord = secret.word;
-    myCategory = secret.category;
-
-    document.getElementById('rolePlayerName').innerText = `${myName} 👤`;
-    document.getElementById('revealBtn').disabled = false;
-    document.getElementById('roleResult').style.display = 'none';
-    document.getElementById('roleReady').style.display = 'none';
-
-    // Watch ready count
-    const totalSnap = await get(ref(db, `rooms/${roomCode}/totalPlayers`));
-    const total = totalSnap.val();
+    const totSnap = await get(ref(db, `rooms/${roomCode}/totalPlayers`));
+    const tot = totSnap.val() || 0;
 
     const rcRef = ref(db, `rooms/${roomCode}/readyCount`);
-    const rcListener = onValue(rcRef, snap => {
+    const rcFn  = onValue(rcRef, snap => {
         const cnt = snap.val() || 0;
-        document.getElementById('readyCount').innerText = `${cnt} / ${total} ئامادەن`;
-        if (cnt >= total) {
+        document.getElementById('rvCount').innerText = `${cnt} / ${tot} ئامادەن ✅`;
+        if (cnt >= tot) {
             update(ref(db, `rooms/${roomCode}`), { status: 'playing' });
         }
     });
-    listeners.push({ ref: rcRef, listener: rcListener });
+    listeners.push({ r: rcRef, fn: rcFn });
+
+    const stRef = ref(db, `rooms/${roomCode}/status`);
+    const stFn  = onValue(stRef, snap => {
+        if (snap.val() === 'playing') enterGame();
+    });
+    listeners.push({ r: stRef, fn: stFn });
 }
 
-window.revealRole = async function() {
-    document.getElementById('revealBtn').disabled = true;
-    const resultEl = document.getElementById('roleResult');
-    resultEl.style.display = 'block';
+window.doReveal = async function() {
+    document.getElementById('rvBtn').disabled = true;
+    const el = document.getElementById('rvResult');
+    el.style.display = 'block';
 
     if (myRole === 'spy') {
-        resultEl.innerHTML = `<div class="role-card spy">🕵️ تۆ جاسوسیت!<span class="big">جۆر: ${myCategory}</span></div>`;
+        el.innerHTML = `<div class="role-box spy">🕵️ تۆ جاسوسیت!<span class="big">جۆر: ${myCat}</span></div>`;
     } else {
-        resultEl.innerHTML = `<div class="role-card normal">✅ تۆ شارەزایی!<span class="big">📌 ${myWord}</span></div>`;
+        el.innerHTML = `<div class="role-box normal">✅ تۆ شارەزایی!<span class="big">📌 ${myWord}</span></div>`;
     }
+    document.getElementById('rvReady').style.display = 'block';
 
-    document.getElementById('roleReady').style.display = 'block';
-
-    // Increment ready
-    const snap = await get(ref(db, `rooms/${roomCode}/readyCount`));
-    const cur = snap.val() || 0;
-    await set(ref(db, `rooms/${roomCode}/readyCount`), cur + 1);
+    try {
+        const snap = await get(ref(db, `rooms/${roomCode}/readyCount`));
+        await set(ref(db, `rooms/${roomCode}/readyCount`), (snap.val() || 0) + 1);
+    } catch(e) { console.error(e); }
 };
 
-// ====== GAME (DISCUSSION + VOTE) ======
+// ============================================================
+//  GAME
+// ============================================================
 async function enterGame() {
-    showScreen('screenGame');
+    offAll();
+    myVoted = false;
+    showScreen('scGame');
+    document.getElementById('gameResult').style.display = 'none';
+    document.getElementById('gameEnd').style.display    = 'none';
 
-    // Show role reminder
-    const reminderEl = document.getElementById('gameRoleReminder');
+    // Role reminder
+    const rEl = document.getElementById('gameRole');
     if (myRole === 'spy') {
-        reminderEl.className = 'role-card spy';
-        reminderEl.innerHTML = `🕵️ تۆ جاسوسیت — جۆر: <b>${myCategory}</b>`;
+        rEl.className = 'role-box spy';
+        rEl.innerHTML = `🕵️ تۆ جاسوسیت — جۆر: <b>${myCat}</b>`;
     } else {
-        reminderEl.className = 'role-card normal';
-        reminderEl.innerHTML = `📌 وشەکە: <b>${myWord}</b>`;
+        rEl.className = 'role-box normal';
+        rEl.innerHTML = `📌 وشەکە: <b>${myWord}</b>`;
     }
 
-    // Timer
-    const settingsSnap = await get(ref(db, `rooms/${roomCode}/settings`));
-    const settings = settingsSnap.val();
-    let timeLeft = settings.minutes * 60;
-    const halfTime = timeLeft / 2;
-    let hint2Shown = false;
+    const setSnap = await get(ref(db, `rooms/${roomCode}/settings`));
+    const sets = setSnap.val();
+    let t = sets.mins * 60;
+    const half = t / 2;
+    let hintShown = false;
 
-    const secretSnap = await get(ref(db, `rooms/${roomCode}/secret`));
-    const secret = secretSnap.val();
-
-    updateTimerDisplay(timeLeft);
-    timerInterval = setInterval(()=>{
-        timeLeft--;
-        updateTimerDisplay(timeLeft);
-
-        if (!hint2Shown && timeLeft <= halfTime) {
-            hint2Shown = true;
-            const hintEl = document.getElementById('gameHint');
-            hintEl.style.display = 'block';
-            hintEl.innerHTML = `💡 <b>هینتی دووەم:</b> ${secret.hint2}`;
+    updateClock(t);
+    timerInt = setInterval(() => {
+        t--;
+        updateClock(t);
+        if (t <= 10) document.getElementById('timer').classList.add('red');
+        if (!hintShown && t <= half) {
+            hintShown = true;
+            const hb = document.getElementById('hintBox');
+            hb.style.display = 'block';
+            hb.innerHTML = `💡 <b>هینتی دووەم:</b> ${myHint}`;
         }
-
-        if (timeLeft <= 10) document.getElementById('timer').classList.add('danger');
-        if (timeLeft <= 0) { clearInterval(timerInterval); }
+        if (t <= 0) clearInterval(timerInt);
     }, 1000);
 
-    // Vote buttons
-    const playersSnap = await get(ref(db, `rooms/${roomCode}/players`));
-    const players = playersSnap.val();
-    const voteGrid = document.getElementById('voteButtons');
-    voteGrid.innerHTML = '';
-    Object.entries(players).forEach(([id, p]) => {
-        const btn = document.createElement('button');
-        btn.className = 'vote-btn';
-        btn.innerText = `🧑 ${p.name}`;
-        btn.onclick = () => castVote(id, p.name);
-        voteGrid.appendChild(btn);
+    // Build vote buttons
+    const pSnap = await get(ref(db, `rooms/${roomCode}/players`));
+    const pls = pSnap.val() || {};
+    const grid = document.getElementById('voteGrid');
+    grid.innerHTML = '';
+    Object.entries(pls).forEach(([id, p]) => {
+        const b = document.createElement('button');
+        b.className = 'vote-btn';
+        b.innerText = `🧑 ${p.name}`;
+        b.onclick = () => castVote(id, p.name);
+        grid.appendChild(b);
     });
 
-    // Listen for result
+    // Listen result
     const resRef = ref(db, `rooms/${roomCode}/result`);
-    const resListener = onValue(resRef, snap => {
-        const result = snap.val();
-        if (result) showFinalResult(result);
+    const resFn  = onValue(resRef, snap => {
+        if (snap.val()) showResult(snap.val());
     });
-    listeners.push({ ref: resRef, listener: resListener });
+    listeners.push({ r: resRef, fn: resFn });
 }
 
-function updateTimerDisplay(t) {
+function updateClock(t) {
     const m = String(Math.floor(t/60)).padStart(2,'0');
     const s = String(t%60).padStart(2,'0');
     document.getElementById('timer').innerText = `⏱️ ${m}:${s}`;
 }
 
 window.castVote = async function(targetId, targetName) {
-    clearInterval(timerInterval);
+    if (myVoted) return;
+    myVoted = true;
+    clearInterval(timerInt);
+    document.querySelectorAll('.vote-btn').forEach(b => b.disabled = true);
+    document.getElementById('voteStatus').innerText = `⌛ دەنگت دا بۆ ${targetName}...`;
 
-    document.querySelectorAll('.vote-btn').forEach(b=>b.disabled=true);
-    document.getElementById('voteStatus').innerText = `دەنگت دا بۆ ${targetName}...`;
+    try {
+        const spiesSnap = await get(ref(db, `rooms/${roomCode}/spies`));
+        const pSnap     = await get(ref(db, `rooms/${roomCode}/players`));
+        const spies     = spiesSnap.val() || [];
+        const players   = pSnap.val() || {};
+        const caught    = spies.includes(targetId);
+        const spyNames  = spies.map(id => players[id]?.name || '?').join('، ');
 
-    // Gather spy list
-    const spiesSnap = await get(ref(db, `rooms/${roomCode}/spies`));
-    const spies = spiesSnap.val() || [];
-    const isSpyCaught = spies.includes(targetId);
-
-    const playersSnap = await get(ref(db, `rooms/${roomCode}/players`));
-    const players = playersSnap.val();
-
-    const spyNames = spies.map(id => players[id]?.name || 'نەناسراو');
-
-    await update(ref(db, `rooms/${roomCode}`), {
-        result: {
-            votedId: targetId,
-            votedName: targetName,
-            spyCaught: isSpyCaught,
-            spyNames,
-            timestamp: Date.now()
-        }
-    });
+        await set(ref(db, `rooms/${roomCode}/result`), {
+            votedId: targetId, votedName: targetName,
+            caught, spyNames, ts: Date.now()
+        });
+    } catch(e) {
+        document.getElementById('voteStatus').innerText = '❌ هەڵە: ' + e.message;
+        myVoted = false;
+    }
 };
 
-function showFinalResult(result) {
-    clearInterval(timerInterval);
-    document.getElementById('voteButtons').innerHTML = '';
+function showResult(r) {
+    clearInterval(timerInt);
+    document.getElementById('voteGrid').innerHTML = '';
     document.getElementById('voteStatus').innerText = '';
 
     const el = document.getElementById('gameResult');
     el.style.display = 'block';
-
-    if (result.spyCaught) {
-        el.className = 'final-result win';
-        el.innerHTML = `🎉 سەرکەوتن!<br>جاسوس ${result.votedName} دەستگیر کرا!<br><small>جاسوسەکان: ${result.spyNames.join('، ')}</small>`;
+    if (r.caught) {
+        el.className = 'result-box win';
+        el.innerHTML = `🎉 <b>سەرکەوتن!</b><br>جاسوس <b>${r.votedName}</b> دەستگیر کرا!<br><small>جاسوسەکان: ${r.spyNames}</small>`;
     } else {
-        el.className = 'final-result lose';
-        el.innerHTML = `❌ هەڵەیە! جاسوسەکە فڕی دا!<br>دەنگت دا بۆ ${result.votedName}<br><small>جاسوسەکان: ${result.spyNames.join('، ')}</small>`;
+        el.className = 'result-box lose';
+        el.innerHTML = `❌ <b>هەڵە!</b> جاسوسەکە فڕی دا!<br>دەنگت دا بۆ <b>${r.votedName}</b><br><small>جاسوسەکان: ${r.spyNames}</small>`;
     }
-
-    document.getElementById('gameButtons').style.display = 'block';
+    document.getElementById('gameEnd').style.display = 'block';
 }
 
-// ====== PLAY AGAIN ======
+// ============================================================
+//  PLAY AGAIN
+// ============================================================
 window.playAgain = async function() {
-    if (isHost) {
-        // Reset for new game with same settings
-        const snap = await get(ref(db, `rooms/${roomCode}/players`));
-        const players = snap.val();
-        await update(ref(db, `rooms/${roomCode}`), {
-            status: 'lobby',
-            roles: null, secret: null, spies: null,
-            readyCount: 0, result: null, votedOut: null
-        });
+    offAll();
+    clearInterval(timerInt);
+    try {
+        if (isHost) {
+            await update(ref(db, `rooms/${roomCode}`), {
+                status: 'lobby', roles: null, secret: null,
+                spies: null, readyCount: 0, result: null, totalPlayers: 0
+            });
+        }
         enterLobby();
-    } else {
-        // Non-host just re-enters lobby
-        enterLobby();
-    }
+    } catch(e) { console.error(e); }
 };
 
-// ====== LEAVE ======
+// ============================================================
+//  LEAVE
+// ============================================================
 window.leaveRoom = async function() {
-    clearAll();
-    await remove(ref(db, `rooms/${roomCode}/players/${myId}`));
-    roomCode = '';
-    myId = null;
-    isHost = false;
-    showScreen('screenHome');
+    offAll();
+    clearInterval(timerInt);
+    try {
+        await remove(ref(db, `rooms/${roomCode}/players/${myId}`));
+    } catch(e) {}
+    roomCode = ''; myId = ''; isHost = false;
+    showScreen('scHome');
 };
 
-function clearAll() {
-    clearInterval(timerInterval);
-    listeners.forEach(l => off(l.ref, 'value', l.listener));
-    listeners = [];
-}
-
-// Cleanup on close
-window.addEventListener('beforeunload', ()=>{
+window.addEventListener('beforeunload', () => {
     if (roomCode && myId) remove(ref(db, `rooms/${roomCode}/players/${myId}`));
 });
+
+// ============================================================
+//  HELPERS
+// ============================================================
+function setErr(id, msg) { document.getElementById(id).innerText = msg; }
 
 </script>
 </body>
