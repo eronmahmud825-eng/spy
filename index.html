@@ -1,12 +1,13 @@
-
 <!DOCTYPE html>
 <html lang="ku">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>🕵️ یاری جاسوس</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap');
 :root{
   --bg:#070910;--c1:#0c1018;--c2:#111520;--c3:#161c2c;
   --border:rgba(255,255,255,0.08);
@@ -14,22 +15,44 @@
   --muted:#566078;--text:#dde2f0;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;direction:rtl;overflow-x:hidden}
+
+/* ═══ CRITICAL KURDISH FONT FIX ═══
+   Noto Naskh Arabic has perfect Kurdish/Arabic ligatures and glyph joining.
+   font-variant-ligatures:common-ligatures ensures letters connect properly.
+   text-rendering:optimizeLegibility activates OpenType features.
+*/
+body{
+  font-family:'Noto Naskh Arabic','Tajawal',sans-serif;
+  font-variant-ligatures:common-ligatures;
+  font-feature-settings:"liga" 1,"calt" 1,"kern" 1;
+  text-rendering:optimizeLegibility;
+  -webkit-font-smoothing:antialiased;
+  background:var(--bg);color:var(--text);
+  min-height:100vh;direction:rtl;overflow-x:hidden;
+  font-size:16px;line-height:1.6;
+}
+
+/* All text elements inherit proper Kurdish rendering */
+input,button,textarea,select{
+  font-family:'Noto Naskh Arabic','Tajawal',sans-serif;
+  font-variant-ligatures:common-ligatures;
+  font-feature-settings:"liga" 1,"calt" 1;
+  text-rendering:optimizeLegibility;
+}
 
 .pg{display:none;min-height:100vh;align-items:center;justify-content:center;padding:16px 14px 32px;flex-direction:column}
 .pg.on{display:flex}
 
 .card{background:var(--c1);border:1px solid var(--border);border-radius:22px;padding:24px 20px;width:100%;max-width:430px}
-.ctitle{font-size:1.5rem;font-weight:900;margin-bottom:4px}
-.csub{color:var(--muted);font-size:13px;margin-bottom:20px}
+.ctitle{font-size:1.5rem;font-weight:900;margin-bottom:4px;font-family:'Noto Naskh Arabic',sans-serif;font-feature-settings:"liga" 1}
+.csub{color:var(--muted);font-size:14px;margin-bottom:20px;font-family:'Noto Naskh Arabic',sans-serif}
 
-.flabel{display:block;font-size:12px;color:var(--muted);margin:14px 0 5px}
-input{width:100%;padding:13px 15px;border-radius:12px;border:1.5px solid var(--border);background:var(--c2);color:var(--text);font-family:inherit;font-size:16px;outline:none;transition:border-color .2s}
+.flabel{display:block;font-size:13px;color:var(--muted);margin:14px 0 5px;font-family:'Noto Naskh Arabic',sans-serif}
+input{width:100%;padding:13px 15px;border-radius:12px;border:1.5px solid var(--border);background:var(--c2);color:var(--text);font-size:16px;outline:none;transition:border-color .2s}
 input:focus{border-color:var(--accent)}
 input::placeholder{color:var(--muted)}
-.code-inp{letter-spacing:10px;text-align:center;font-size:2.2rem;font-weight:900;text-transform:uppercase}
 
-.btn{display:block;width:100%;padding:15px;margin-top:12px;border:none;border-radius:14px;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;transition:transform .1s,opacity .15s}
+.btn{display:block;width:100%;padding:15px;margin-top:12px;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;transition:transform .1s,opacity .15s;font-family:'Noto Naskh Arabic',sans-serif;font-feature-settings:"liga" 1}
 .btn:active{transform:scale(.97)}
 .btn:disabled{opacity:.3;cursor:not-allowed;transform:none!important}
 .bp{background:linear-gradient(135deg,#7b6fff,#5b4cdf);color:#fff}
@@ -38,230 +61,80 @@ input::placeholder{color:var(--muted)}
 .bd{background:var(--c2);color:var(--text);border:1px solid var(--border)}
 .bgold{background:linear-gradient(135deg,#ffc94d,#e6a800);color:#1a1000}
 
-.tabs{display:flex;gap:8px;margin-bottom:18px}
-.tab{flex:1;padding:11px;border-radius:12px;border:1.5px solid transparent;background:var(--c2);color:var(--muted);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;margin:0;transition:all .2s}
-.tab.on{background:rgba(123,111,255,.15);color:var(--accent);border-color:var(--accent)}
-
-.mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px}
-.mode-card{background:var(--c2);border:1.5px solid var(--border);border-radius:16px;padding:20px 14px;text-align:center;cursor:pointer;transition:all .2s;margin:0;font-family:inherit;width:100%}
+.mode-grid{display:grid;grid-template-columns:1fr;gap:12px;margin-top:6px}
+.mode-card{background:var(--c2);border:1.5px solid var(--border);border-radius:16px;padding:24px 14px;text-align:center;cursor:pointer;transition:all .2s;margin:0;width:100%;font-family:'Noto Naskh Arabic',sans-serif}
 .mode-card:hover{border-color:var(--accent);background:rgba(123,111,255,.08)}
 .mode-card:active{transform:scale(.97)}
-.mode-icon{font-size:2.2rem;display:block;margin-bottom:8px}
-.mode-label{font-size:14px;font-weight:900;display:block;color:var(--text)}
-.mode-sub{font-size:11px;color:var(--muted);display:block;margin-top:3px}
-
-.big-code{font-size:3.2rem;font-weight:900;letter-spacing:14px;text-align:center;color:var(--gold);padding:14px 0 10px;cursor:pointer;user-select:all}
-.big-code:active{opacity:.6}
-.code-note{text-align:center;color:var(--muted);font-size:12px;margin-bottom:4px}
+.mode-icon{font-size:2.4rem;display:block;margin-bottom:8px}
+.mode-label{font-size:16px;font-weight:900;display:block;color:var(--text);font-family:'Noto Naskh Arabic',sans-serif;font-feature-settings:"liga" 1}
+.mode-sub{font-size:13px;color:var(--muted);display:block;margin-top:3px;font-family:'Noto Naskh Arabic',sans-serif}
 
 .plist{margin-top:4px;min-height:40px}
 .pitem{display:flex;align-items:center;justify-content:space-between;background:var(--c2);border-radius:13px;padding:12px 14px;margin-bottom:8px;border:1px solid var(--border);animation:fadeup .25s ease}
 @keyframes fadeup{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
 .pleft{display:flex;align-items:center;gap:10px}
 .pdot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0}
-.pname{font-size:15px;font-weight:700}
-.badges{display:flex;gap:5px}
-.badge{font-size:10px;padding:2px 8px;border-radius:8px;font-weight:700}
-.bhost{background:rgba(123,111,255,.25);color:var(--accent)}
-.bme{background:rgba(0,212,154,.2);color:var(--green)}
-.kick-btn{background:rgba(255,34,68,.1);border:1px solid rgba(255,34,68,.25);color:var(--red);border-radius:9px;padding:5px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0}
+.pname{font-size:15px;font-weight:700;font-family:'Noto Naskh Arabic',sans-serif;font-feature-settings:"liga" 1}
 
 .srow{display:flex;justify-content:space-between;align-items:center;font-size:14px;margin-bottom:10px}
-.srow-label{color:var(--muted)}
+.srow-label{color:var(--muted);font-family:'Noto Naskh Arabic',sans-serif}
 .hr{height:1px;background:var(--border);margin:16px 0}
 
-#gtimer{font-size:3rem;font-weight:900;text-align:center;letter-spacing:5px;padding:14px;border-radius:18px;background:var(--c2);border:1px solid var(--border);margin-bottom:14px}
-#gtimer.red{color:var(--red);animation:blink 1s infinite}
-#offtimer{font-size:3rem;font-weight:900;text-align:center;letter-spacing:5px;padding:14px;border-radius:18px;background:var(--c2);border:1px solid var(--border);margin-bottom:14px}
+#offtimer{font-size:3rem;font-weight:700;text-align:center;letter-spacing:5px;padding:14px;border-radius:18px;background:var(--c2);border:1px solid var(--border);margin-bottom:14px;font-family:'Noto Naskh Arabic',sans-serif}
 #offtimer.red{color:var(--red);animation:blink 1s infinite}
 @keyframes blink{50%{opacity:.4}}
 
-.rcard{border-radius:18px;padding:20px 16px;text-align:center;margin:12px 0;line-height:2}
+.rcard{border-radius:18px;padding:20px 16px;text-align:center;margin:12px 0;line-height:2;font-family:'Noto Naskh Arabic',sans-serif;font-feature-settings:"liga" 1}
 .rcard .em{font-size:2.4rem;display:block}
-.rcard .wd{font-size:1.9rem;font-weight:900;display:block;margin-top:2px}
-.rcard small{font-size:12px;opacity:.7}
+.rcard .wd{font-size:1.9rem;font-weight:900;display:block;margin-top:2px;font-family:'Noto Naskh Arabic',sans-serif;font-feature-settings:"liga" 1}
+.rcard small{font-size:13px;opacity:.7;font-family:'Noto Naskh Arabic',sans-serif}
 .rspy{background:rgba(255,34,68,.15);border:1.5px solid var(--red)}
 .rnorm{background:rgba(0,212,154,.15);border:1.5px solid var(--green)}
 
-.hintbox{background:rgba(255,201,77,.08);border:1px solid rgba(255,201,77,.3);border-radius:12px;padding:11px 15px;font-size:14px;margin-bottom:12px;text-align:center;display:none}
+.hintbox{background:rgba(255,201,77,.08);border:1px solid rgba(255,201,77,.3);border-radius:12px;padding:11px 15px;font-size:14px;margin-bottom:12px;text-align:center;display:none;font-family:'Noto Naskh Arabic',sans-serif;font-feature-settings:"liga" 1}
 
 .vgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:10px}
-.vbtn{margin:0;padding:13px 8px;border-radius:14px;background:rgba(255,201,77,.07);border:1.5px solid rgba(255,201,77,.25);color:var(--gold);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .15s}
+.vbtn{margin:0;padding:13px 8px;border-radius:14px;background:rgba(255,201,77,.07);border:1.5px solid rgba(255,201,77,.25);color:var(--gold);font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Naskh Arabic',sans-serif;font-feature-settings:"liga" 1;transition:background .15s}
 .vbtn:hover{background:rgba(255,201,77,.15)}
 .vbtn:disabled{opacity:.3;cursor:not-allowed}
 
-.resbox{border-radius:18px;padding:20px 16px;text-align:center;font-size:1rem;line-height:2;margin:14px 0}
+.resbox{border-radius:18px;padding:20px 16px;text-align:center;font-size:1rem;line-height:2;margin:14px 0;font-family:'Noto Naskh Arabic',sans-serif;font-feature-settings:"liga" 1}
 .rwin{background:rgba(0,212,154,.1);border:1.5px solid var(--green)}
 .rlose{background:rgba(255,34,68,.1);border:1.5px solid var(--red)}
 
 .off-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);display:none;align-items:center;justify-content:center;z-index:100;padding:20px}
 .off-overlay.on{display:flex}
 .off-inner{background:var(--c1);border:1px solid var(--border);border-radius:22px;padding:28px 22px;width:100%;max-width:380px;text-align:center}
-.big-pname{font-size:1.8rem;font-weight:900;margin-bottom:4px}
+.big-pname{font-size:1.8rem;font-weight:900;margin-bottom:4px;font-family:'Noto Naskh Arabic',sans-serif;font-feature-settings:"liga" 1}
 
-.status{text-align:center;color:var(--muted);font-size:13px;margin:8px 0}
-.err{color:var(--red);text-align:center;font-size:13px;margin-top:8px;min-height:18px}
-.ok{color:var(--green);text-align:center;font-size:12px;min-height:16px}
-.dots::after{content:'...';animation:dt 1.2s steps(4,end) infinite}
-@keyframes dt{0%{content:'.'}33%{content:'..'}66%,100%{content:'...'}}
-.spin{width:42px;height:42px;border-radius:50%;border:3px solid rgba(255,255,255,.07);border-top-color:var(--accent);animation:sp .8s linear infinite;margin:0 auto 16px}
-@keyframes sp{to{transform:rotate(360deg)}}
-.ready-bar{display:flex;justify-content:space-between;align-items:center;background:var(--c2);border-radius:11px;padding:11px 15px;margin-top:14px;font-size:14px}
-.ready-bar b{color:var(--gold)}
-#toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:var(--c2);border:1px solid var(--border);border-radius:12px;padding:11px 22px;font-size:13px;font-weight:700;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;z-index:9999}
+.status{text-align:center;color:var(--muted);font-size:13px;margin:8px 0;font-family:'Noto Naskh Arabic',sans-serif}
+.err{color:var(--red);text-align:center;font-size:13px;margin-top:8px;min-height:18px;font-family:'Noto Naskh Arabic',sans-serif}
+.ok{color:var(--green);text-align:center;font-size:12px;min-height:16px;font-family:'Noto Naskh Arabic',sans-serif}
+
+#toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:var(--c2);border:1px solid var(--border);border-radius:12px;padding:11px 22px;font-size:13px;font-weight:700;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;z-index:9999;font-family:'Noto Naskh Arabic',sans-serif}
 #toast.show{opacity:1}
 
-.db-warn{background:rgba(255,201,77,.1);border:1px solid rgba(255,201,77,.3);border-radius:12px;padding:12px 14px;font-size:13px;line-height:1.7;margin-bottom:14px;display:none}
-.db-warn.on{display:block}
-.code-block{background:#000;border-radius:8px;padding:10px 12px;font-family:monospace;font-size:12px;color:var(--green);margin-top:8px;white-space:pre;overflow-x:auto;text-align:left;direction:ltr}
-.step{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px;font-size:13px;line-height:1.6}
-.step-n{min-width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;font-size:11px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+/* Name input row */
+.name-row{display:flex;align-items:center;gap:8px;margin-top:8px}
+.name-row input{flex:1;margin:0}
+.del-btn{background:rgba(255,34,68,.12);border:1px solid rgba(255,34,68,.25);color:var(--red);border-radius:10px;padding:12px 14px;font-size:16px;cursor:pointer;flex-shrink:0;line-height:1}
+.del-btn:hover{background:rgba(255,34,68,.22)}
 </style>
 </head>
 <body>
 <div id="toast"></div>
 
-<!-- ════ LOADING ════ -->
-<div class="pg on" id="pgLoad">
-  <div class="card" style="text-align:center;padding:40px 24px">
-    <div class="spin"></div>
-    <div class="ctitle" style="font-size:1.2rem">بارکردن<span class="dots"></span></div>
-    <p class="csub" style="margin-top:4px">پەیوەندی بە Firebase</p>
-    <p class="status" id="loadStatus" style="font-size:12px"></p>
-  </div>
-</div>
-
 <!-- ════ MAIN MENU ════ -->
-<div class="pg" id="pgMenu">
+<div class="pg on" id="pgMenu">
   <div class="card">
     <div class="ctitle">🕵️ یاری جاسوس</div>
-    <p class="csub">شێوازی یاری هەڵبژێرە</p>
+    <p class="csub">یاری نهێنی — کێ جاسوسە؟</p>
     <div class="mode-grid">
-      <button class="mode-card" onclick="goPage('pgOnline')">
-        <span class="mode-icon">🌐</span>
-        <span class="mode-label">ئۆنلاین</span>
-        <span class="mode-sub">مۆبایلی جیاواز</span>
-      </button>
       <button class="mode-card" onclick="goOffline()">
         <span class="mode-icon">📱</span>
-        <span class="mode-label">ئۆفلاین</span>
-        <span class="mode-sub">یەک مۆبایل</span>
+        <span class="mode-label">دەستپێکردنی یاری</span>
+        <span class="mode-sub">یەک مۆبایل — هەموو پلەیەرەکان</span>
       </button>
-    </div>
-  </div>
-</div>
-
-<!-- ════ ONLINE HOME ════ -->
-<div class="pg" id="pgOnline">
-  <div class="card">
-    <div class="ctitle">🌐 یاری ئۆنلاین</div>
-    <p class="csub">هاوڕێکانت لە مۆبایلی خۆیانەوە بەشداری دەبن</p>
-
-    <!-- Firebase setup warning -->
-    <div class="db-warn" id="dbWarn">
-      <b>⚠️ Firebase Realtime Database پێویستە!</b>
-      <div class="step"><div class="step-n">1</div><div>بچوو بۆ: <a href="https://console.firebase.google.com/project/spygames-c2744/database" target="_blank" style="color:var(--accent)">Firebase Console</a></div></div>
-      <div class="step"><div class="step-n">2</div><div><b>Realtime Database → Create Database</b><br>ناوچە: United States | Mode: Test Mode</div></div>
-      <div class="step"><div class="step-n">3</div><div><b>Rules tab</b> ئەم کۆدەی بنووسە:
-        <div class="code-block">{
-  "rules": {
-    ".read": true,
-    ".write": true
-  }
-}</div>
-        دوای ئەوە <b>Publish</b> بکە
-      </div></div>
-    </div>
-
-    <div class="tabs">
-      <button class="tab on" id="tbC" onclick="swTab('c')">🆕 دروستکردن</button>
-      <button class="tab"    id="tbJ" onclick="swTab('j')">🔗 بەشداربوون</button>
-    </div>
-
-    <div id="panC">
-      <span class="flabel">👤 ناوت</span>
-      <input id="cName" type="text" placeholder="ناوت بنووسە" maxlength="14">
-      <span class="flabel">👥 ژمارەی پلەیەرەکان (زانیاری تەنها)</span>
-      <input id="cPlayers" type="number" min="2" max="20" value="6">
-      <span class="flabel">🕵️ ژمارەی جاسوسەکان</span>
-      <input id="cSpies" type="number" min="1" max="5" value="1">
-      <span class="flabel">⏱️ ماوە (خولەک)</span>
-      <input id="cMins" type="number" min="1" max="20" value="5">
-      <button class="btn bp" onclick="createRoom()">🚀 دروستکردنی ژوور</button>
-    </div>
-
-    <div id="panJ" style="display:none">
-      <span class="flabel">👤 ناوت</span>
-      <input id="jName" type="text" placeholder="ناوت بنووسە" maxlength="14">
-      <span class="flabel">🔑 کۆدی ژوور (4 پیت)</span>
-      <input id="jCode" type="text" class="code-inp" placeholder="AB12" maxlength="4"
-             oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')">
-      <button class="btn bg" onclick="joinRoom()">🔗 بەشداربوون</button>
-    </div>
-    <div id="homeErr" class="err"></div>
-    <button class="btn bd" onclick="goPage('pgMenu')" style="margin-top:8px">← گەڕانەوە</button>
-  </div>
-</div>
-
-<!-- ════ LOBBY ════ -->
-<div class="pg" id="pgLobby">
-  <div class="card">
-    <div class="ctitle">🏠 ژووری چاوەڕوان</div>
-    <div class="big-code" id="lobCode" onclick="copyCode()">----</div>
-    <p class="code-note">👆 کرتەی کۆدەکە بکە بۆ کۆپی — بنێرە بۆ هاوڕێکانت</p>
-    <div class="ok" id="copyOk"></div>
-    <div class="hr"></div>
-    <div class="srow">
-      <span class="srow-label">پلەیەرەکان بەشداربوون</span>
-      <b id="lobCount">0</b>
-    </div>
-    <div class="plist" id="lobList">
-      <p class="status">چاوەڕوان<span class="dots"></span></p>
-    </div>
-    <div class="hr"></div>
-    <div id="hostArea" style="display:none">
-      <button class="btn bg" id="startBtn" onclick="hostStart()" disabled>▶️ دەستپێکردنی یاری</button>
-      <p class="status" id="hostHint" style="font-size:12px;margin-top:6px"></p>
-    </div>
-    <div id="guestArea" style="display:none">
-      <p class="status">⏳ چاوەڕوانی هۆستەکە بۆ دەستپێکردن<span class="dots"></span></p>
-    </div>
-    <button class="btn bd" onclick="leaveRoom()" style="margin-top:8px">🚪 چوونەدەرەوە</button>
-    <div id="lobErr" class="err"></div>
-  </div>
-</div>
-
-<!-- ════ REVEAL (ONLINE) ════ -->
-<div class="pg" id="pgReveal">
-  <div class="card" style="text-align:center">
-    <div class="ctitle" id="rvTitle">ڕۆڵەکەت ببینە</div>
-    <p class="csub">مۆبایلەکەت ببە لاتەوە — تەنها تۆ ببینە!</p>
-    <button class="btn bp" id="rvBtn" onclick="doReveal()">👁️ پیشاندانی ڕۆڵ</button>
-    <div id="rvCard" style="display:none;margin-top:14px"></div>
-    <div id="rvWait" style="display:none">
-      <div class="ready-bar">
-        <span>ئامادەن:</span>
-        <b><span id="rvReady">0</span> / <span id="rvTotal">0</span></b>
-      </div>
-      <p class="status" style="font-size:12px">چاوەڕوانی هاوڕێکانت<span class="dots"></span></p>
-    </div>
-  </div>
-</div>
-
-<!-- ════ GAME (ONLINE) ════ -->
-<div class="pg" id="pgGame">
-  <div class="card">
-    <div id="gtimer">⏱️ 00:00</div>
-    <div class="hintbox" id="hintBox"></div>
-    <div class="rcard" id="gameRole"></div>
-    <div class="hr"></div>
-    <div style="text-align:center;font-weight:700;margin-bottom:8px;font-size:15px">🗳️ دەنگ بدە — جاسوس کێیە؟</div>
-    <p class="status" id="vMsg"></p>
-    <div class="vgrid" id="vGrid"></div>
-    <div id="gameRes" style="display:none"></div>
-    <div id="gameEnd" style="display:none">
-      <button class="btn bg" onclick="playAgain()">🔄 یاری نوێ (هەمان ژوور)</button>
-      <button class="btn bd" onclick="leaveRoom()" style="margin-top:8px">🏠 دەرچوون</button>
     </div>
   </div>
 </div>
@@ -269,16 +142,16 @@ input::placeholder{color:var(--muted)}
 <!-- ════ OFFLINE SETUP ════ -->
 <div class="pg" id="pgOffline">
   <div class="card">
-    <div class="ctitle">📱 یاری ئۆفلاین</div>
-    <p class="csub">یەک مۆبایل — هەر پلەیەرێک بەسەربەینی ڕۆڵی خۆی دەبینێت</p>
+    <div class="ctitle">📱 ڕێکخستنی یاری</div>
+    <p class="csub">ناوی پلەیەرەکان زیاد بکە</p>
     <span class="flabel">🕵️ ژمارەی جاسوسەکان</span>
     <input id="offSpies" type="number" min="1" max="5" value="1">
     <span class="flabel">⏱️ ماوە (خولەک)</span>
     <input id="offMins" type="number" min="1" max="20" value="5">
     <div class="hr"></div>
-    <p style="font-size:13px;color:var(--muted);margin-bottom:10px">👤 ناوی پلەیەرەکان زیاد بکە (کەمترین ٢)</p>
+    <p style="font-size:14px;color:var(--muted);margin-bottom:6px;font-family:'Noto Naskh Arabic',sans-serif">👤 ناوی پلەیەرەکان زیاد بکە (کەمترین ٢)</p>
     <div id="offNameList"></div>
-    <button class="btn bd" style="margin-top:8px" onclick="addOffName()">➕ زیادکردنی پلەیەر</button>
+    <button class="btn bd" style="margin-top:12px" onclick="addOffName()">➕ زیادکردنی پلەیەر</button>
     <button class="btn bp" id="offStartBtn" onclick="startOffGame()" style="margin-top:8px" disabled>🚀 دەستپێکردن</button>
     <div id="offErr" class="err"></div>
     <button class="btn bd" onclick="goPage('pgMenu')" style="margin-top:8px">← گەڕانەوە</button>
@@ -288,9 +161,9 @@ input::placeholder{color:var(--muted)}
 <!-- ════ OFFLINE ROLE REVEAL OVERLAY ════ -->
 <div class="off-overlay" id="offOverlay">
   <div class="off-inner">
-    <div style="font-size:11px;color:var(--muted);margin-bottom:6px" id="offStepLbl">گامی ١ لە ٦</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:6px;font-family:'Noto Naskh Arabic',sans-serif" id="offStepLbl">گامی ١ لە ٦</div>
     <div class="big-pname" id="offPName">پلەیەری ١</div>
-    <p class="csub">مۆبایلەکەت بگرە — تەنها تۆ ببینە!</p>
+    <p class="csub" style="margin-bottom:18px">مۆبایلەکەت بگرە — تەنها تۆ ببینە!</p>
     <button class="btn bp" id="offRevBtn" onclick="showOffRole()">👁️ پیشاندانی ڕۆڵ</button>
     <div id="offRoleCard" style="display:none;margin-top:14px"></div>
     <button class="btn bg" id="offNextBtn" onclick="nextOffPlayer()" style="display:none;margin-top:12px">➡️ داهاتوو</button>
@@ -304,7 +177,7 @@ input::placeholder{color:var(--muted)}
     <div class="hintbox" id="offHint"></div>
     <div class="rcard" id="offGameRole"></div>
     <div class="hr"></div>
-    <div style="text-align:center;font-weight:700;margin-bottom:8px;font-size:15px">🗳️ دەنگ بدە — جاسوس کێیە؟</div>
+    <div style="text-align:center;font-weight:700;margin-bottom:8px;font-size:15px;font-family:'Noto Naskh Arabic',sans-serif;font-feature-settings:'liga' 1">🗳️ دەنگ بدە — جاسوس کێیە؟</div>
     <p class="status" id="offVMsg"></p>
     <div class="vgrid" id="offVGrid"></div>
     <div id="offRes" style="display:none"></div>
@@ -315,790 +188,231 @@ input::placeholder{color:var(--muted)}
   </div>
 </div>
 
-<script type="module">
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-//  FIREBASE IMPORTS
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-import { initializeApp } from
-  "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import {
-  getDatabase, ref, set, get, update, remove, onValue, off, serverTimestamp
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
-const FB = {
-  apiKey:            "AIzaSyAzpQ9kpRs9syqFJkL4khpJg-f8Hf3rQi8",
-  authDomain:        "spygames-c2744.firebaseapp.com",
-  databaseURL:       "https://spygames-c2744-default-rtdb.firebaseio.com",
-  projectId:         "spygames-c2744",
-  storageBucket:     "spygames-c2744.firebasestorage.app",
-  messagingSenderId: "508332573335",
-  appId:             "1:508332573335:web:2893d35f1c0b25e81e9fd2"
-};
-
-let db, fbReady = false;
-
+<script>
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 //  WORDS
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const WORDS = [
-  {cat:"شار/ووڵات",  hint:"شوێنێکی ناسراو",   items:["سلێمانی","هەولێر","دهۆک","کرکوک","بەغدا","کەنەدا","ئەمەریکا","نیۆڕک","لەندەن","پاریس","ئیتالیا","ئالمانیا","تورکیا","ئێران","ژاپۆن","دوبەی","ئەستەنبوول","بارسەلۆنا"]},
-  {cat:"خواردن",      hint:"خواردنێکی ناسراو",  items:["کەباب","پیتزا","بەریانی","دۆنەر","ماسی","برنج","یاپراخ","شفتە","کفتە","مریشک","گۆشت","سووپ","هەمبەرگەر","پاستا","ساندویچ","لازانیا","سوشی","شاورما"]},
-  {cat:"سۆشیال میدیا",hint:"پلاتفۆرمی ئینتەرنێت",items:["یوتوب","تیکتۆک","فەیسبووک","ئینستاگرام","ئێکس","تویچ","سناپ","دیسکۆرد","واتساپ","تێلێگرام","لینکدین","پینتەرست"]},
-  {cat:"ئاژەڵ",       hint:"زیندووەکان",         items:["سەگ","پشیلە","مانگا","مار","گوورگ","شێر","بزن","کەر","مەیموون","ووشتر","کۆتر","قاز","نەهەنگ","زەرافە","فیل","ئەسپ","ببر","پلەنگ"]},
-  {cat:"شت/بێگیان",  hint:"شتێکی ڕۆژانە",      items:["کورسی","فڕن","قەنەفە","زۆپا","سەیارە","تەیارە","مۆبایل","تەلەفزیۆن","بەلەم","بەرد","جل","کاتژمێر","لاپتۆپ","فریدجەر","ماکرۆوێف"]},
-  {cat:"وەرزش",       hint:"چالاکییەکی جەستەیی",items:["فوتبۆل","بەسکێتبۆل","تێنیس","موی تای","شناکردن","والێبۆل","بۆکس","گۆڵف","کرکێت","ڕووکردن","تەکواندۆ"]},
-  {cat:"فیلم",        hint:"فیلمێکی ناسراو",    items:["تایتانیک","ئەڤاتار","ئینسێپشن","ئینتەرستێلار","مەتریکس","گودفادەر","هاری پۆتەر","باتمان","سوپەرمان","جۆکەر","ئەڤنجەرز"]},
-  {cat:"پیشە",        hint:"کارێکی مرۆڤ",       items:["دکتۆر","مامۆستا","ئەندازیار","پۆلیس","پەرستار","شۆفێر","وەرزشکار","کۆمیکان","نووسەر","دیزاینەر","ئاشپەز","دەلاڵ"]}
+  {cat:"شار/ووڵات",      hint:"شوێنێکی ناسراو",        items:[سلێمانی","هەولێر","دهۆک","کرکوک","بەغدا","کەنەدا","ئەمەریکا","نیۆڕک","لەندەن","پاریس","ئیتالیا","ئالمانیا","تورکیا","ئێران","ژاپۆن","دوبەی""]},
+  {cat:"خواردن",          hint:"خواردنێکی ناسراو",      items:["کەباب","پیتزا","بەریانی","دۆنەر","ماسی","برنج","یاپراخ","شفتە","کفتە","مریشک","گۆشت","سووپ","هەمبەرگەر","پاستا","ساندویچ","لازانیا","سوشی","شاورما"]},
+  {cat:"سۆشیال میدیا",   hint:"پلاتفۆرمی ئینتەرنێت",  items:["یوتوب","تیکتۆک","فەیسبووک","ئینستاگرام","ئێکس","تویچ","سناپ","دیسکۆرد","واتساپ","تێلێگرام","پینتەرست"]},
+  {cat:"ئاژەڵ",           hint:"زیندووەکان",             items:["سەگ","پشیلە","مار","گوورگ","شێر","بزن","کەر","مەیموون","ووشتر","کۆتر","قاز","نەهەنگ","زەرافە","ئەسپ","پلەنگ"]},
+  {cat:"شت/بێگیان",      hint:"شتێکی ڕۆژانە",          items:["کورسی","فڕن","قەنەفە","زۆپا","سەیارە","تەیارە","مۆبایل","تەلەفزیۆن","بەلەم","بەرد","جل","کاتژمێر","لاپتۆپ","فریدجەر","ماکرۆوێف"]},
+  {cat:"وەرزش",           hint:"چالاکییەکی جەستەیی",    items:["فوتبۆل","بەسکێتبۆل","تێنیس","شناکردن","والێبۆل","بۆکس","گۆڵف","تەکواندۆ"]},
+  {cat:"فیلم",            hint:"فیلمێکی ناسراو",        items:["تایتانیک","ئەڤاتار","ئینسێپشن","ئینتەرستێلار","مەتریکس","گودفادەر","هاری پۆتەر","باتمان","سوپەرمان","جۆکەر","ئەڤنجەرز"]},
+  {cat:"پیشە",            hint:"کارێکی مرۆڤ",           items:["دکتۆر","مامۆستا","ئەندازیار","پۆلیس","پەرستار","شۆفێر","وەرزشکار","نووسەر","دیزاینەر","دەلاڵ"]},
+
+  // ⚽ NEW: Football Teams
+  {cat:"تیمی فوتبۆل ⚽",  hint:"تیمێکی ناسراوی فوتبۆل", items:[
+    "مانچستەر سیتی","ڕیال مادرید","بارسەلۆنا","ئاک میلان","بایەرن موونیخ",
+    "لیڤەرپوول","مانچستەر یونایتد","چێلسی","ئارسنال","توتنهام",
+    "یووێنتووس","ئینتەر میلان","پاری سەن-ژەرمێن","بۆرووسیا دۆرتموند",
+    "ئاتلێتیکۆ مادرید","نەپۆلی","ئەیاکس","بنفیکا","پۆرتۆ","سەڤیا",
+    "ڤالێنسیا","ڤیاڕیال","لاتسیو","ڕۆما","فیۆرێنتینا",
+    "لێستەر سیتی","ئێڤەرتۆن","نیووکاسڵ","ئاستۆن ڤیلا","وێست هام"
+  ]},
+
+  // 🌟 NEW: Football Players
+  {cat:"یاریزانی فوتبۆل 🌟", hint:"یاریزانێکی ناسراوی فوتبۆل", items:[
+    "هالاند","مێسی","ڕۆنالدۆ","ئەمبابێ","نەیمار","مۆدریچ",
+    "ڤینیسیووس جوونیۆر","بێلینگهام","سالا","دی بروینە",
+    "لێواندۆوسکی","بێنزەما","ئیبراهیمۆڤیچ","نێیمار","سوناێ",
+    "تریپییەر","ڕاشفۆرد","سانچۆ","گریلیش","فۆدن",
+    "تیاگۆ ئالکانتارا","پێدری","گاڤی","بارسیا","یامال",
+    "ئۆسیمهێن","دیۆگۆ جۆتا","دارویین نوونیەز","کیلیان مبابێ","زیدان"
+  ]}
 ];
+
 function pickSecret(){
   const g = WORDS[Math.floor(Math.random()*WORDS.length)];
   return {word:g.items[Math.floor(Math.random()*g.items.length)], cat:g.cat, hint:g.hint};
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-//  ONLINE STATE
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-let myId='', myName='', roomCode='', isHost=false;
-let myRole='', myWord='', myCat='', myHint='';
-let myVoted=false, myRevealed=false;
-let onlineTimerID=null;
-let activeListeners = []; // {path, fn} — for cleanup
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-//  OFFLINE STATE
+//  STATE
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 let offPlayers=[], offSecret={}, offCurIdx=0, offTimerID=null, offRevealed=false;
-let offNameCount = 0;
+let offNameCount=0;
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 //  HELPERS
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function uid(){ return Math.random().toString(36).substr(2,9); }
-function genCode(){
-  const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  return [0,0,0,0].map(()=>c[Math.floor(Math.random()*c.length)]).join('');
-}
-window.goPage = function(id){
+function goPage(id){
   document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
   document.getElementById(id).classList.add('on');
-};
+}
+window.goPage = goPage;
+
 function toast(msg){
   const e=document.getElementById('toast');
   e.innerText=msg; e.classList.add('show');
   setTimeout(()=>e.classList.remove('show'),2500);
 }
-function setErr(id,m){ const e=document.getElementById(id); if(e) e.innerText=m; }
-function stopOnlineTimer(){ clearInterval(onlineTimerID); onlineTimerID=null; }
-function stopOffTimer(){ clearInterval(offTimerID); offTimerID=null; }
-
-// Remove ALL active Firebase listeners
-function clearListeners(){
-  activeListeners.forEach(({r, fn})=>{ try{ off(r,'value',fn); }catch(e){} });
-  activeListeners = [];
-}
-
-// Add a listener and track it for cleanup
-function listen(path, callback){
-  const r = ref(db, path);
-  const fn = onValue(r, callback, err=>console.warn('FB err',path,err));
-  activeListeners.push({r, fn});
-  return fn;
-}
+function setErr(id,m){const e=document.getElementById(id);if(e)e.innerText=m;}
+function stopOffTimer(){clearInterval(offTimerID);offTimerID=null;}
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-//  FIREBASE INIT
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-async function initFirebase(){
-  try {
-    const app = initializeApp(FB);
-    db = getDatabase(app);
-
-    document.getElementById('loadStatus').innerText = 'پەیوەندی پشکنین...';
-
-    // Wait for connection
-    await new Promise((resolve, reject)=>{
-      const connRef = ref(db, '.info/connected');
-      const timer = setTimeout(()=>{ off(connRef); reject(new Error('timeout')); }, 8000);
-      const unsub = onValue(connRef, snap=>{
-        if(snap.val()===true){
-          clearTimeout(timer);
-          off(connRef,'value',unsub);
-          resolve();
-        }
-      }, err=>{ clearTimeout(timer); reject(err); });
-    });
-
-    fbReady = true;
-    document.getElementById('dbWarn').classList.remove('on');
-    goPage('pgMenu');
-
-  } catch(e) {
-    console.warn('Firebase connection failed:', e);
-    fbReady = false;
-    document.getElementById('dbWarn').classList.add('on');
-    goPage('pgMenu');
-  }
-}
-
-initFirebase();
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-//  TABS
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-window.swTab = function(t){
-  document.getElementById('panC').style.display = t==='c'?'block':'none';
-  document.getElementById('panJ').style.display = t==='j'?'block':'none';
-  document.getElementById('tbC').classList.toggle('on', t==='c');
-  document.getElementById('tbJ').classList.toggle('on', t==='j');
-  setErr('homeErr','');
-};
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-//  CREATE ROOM
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-window.createRoom = async function(){
-  if(!fbReady){ setErr('homeErr','❌ Firebase پەیوەست نییە — Firebase Rules پشکنە'); return; }
-
-  const name    = document.getElementById('cName').value.trim();
-  const players = parseInt(document.getElementById('cPlayers').value) || 6;
-  const spies   = parseInt(document.getElementById('cSpies').value)   || 1;
-  const mins    = parseInt(document.getElementById('cMins').value)    || 5;
-
-  if(!name)          { setErr('homeErr','⚠️ ناوت بنووسە'); return; }
-  if(spies>=players) { setErr('homeErr','⚠️ ژمارەی جاسوس زیادتره'); return; }
-  if(spies<1)        { setErr('homeErr','⚠️ کەمترین جاسوس ١ دەبێت'); return; }
-  setErr('homeErr','');
-
-  myId      = uid();
-  myName    = name;
-  isHost    = true;
-  roomCode  = genCode();
-
-  try {
-    // Write room to Firebase
-    await set(ref(db, `rooms/${roomCode}`), {
-      host:         myId,
-      status:       'lobby',
-      settings:     { players, spies, mins },
-      roles:        null,
-      spies:        null,
-      secret:       null,
-      readyCnt:     0,
-      totalPlayers: 0,
-      result:       null
-    });
-
-    // Write host as first player
-    await set(ref(db, `rooms/${roomCode}/players/${myId}`), {
-      name:   myName,
-      host:   true,
-      joined: Date.now()
-    });
-
-    enterLobby();
-  } catch(e){
-    setErr('homeErr', '❌ هەڵە — دڵنیابە Firebase Rules درووست کراوە: ' + e.message);
-  }
-};
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-//  JOIN ROOM
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-window.joinRoom = async function(){
-  if(!fbReady){ setErr('homeErr','❌ Firebase پەیوەست نییە'); return; }
-
-  const name = document.getElementById('jName').value.trim();
-  const code = document.getElementById('jCode').value.trim().toUpperCase();
-
-  if(!name) { setErr('homeErr','⚠️ ناوت بنووسە'); return; }
-  if(!code) { setErr('homeErr','⚠️ کۆدی ژوور بنووسە'); return; }
-  setErr('homeErr','');
-
-  try {
-    // Check room exists
-    const snap = await get(ref(db, `rooms/${code}`));
-    if(!snap.exists()){
-      setErr('homeErr','❌ ژوورەکە نەدۆزرایەوە — کۆدەکە دووبارە بپشکنە');
-      return;
-    }
-
-    const room = snap.val();
-    if(room.status === 'reveal' || room.status === 'playing'){
-      setErr('homeErr','❌ یاریەکە دەستیپێکردووە — دەتوانیت چاوەڕوان بیت');
-      return;
-    }
-
-    myId     = uid();
-    myName   = name;
-    isHost   = false;
-    roomCode = code;
-
-    // Write this player to Firebase — THIS IS THE KEY STEP
-    // Once written, the host's onValue listener fires and shows this player
-    await set(ref(db, `rooms/${roomCode}/players/${myId}`), {
-      name:   myName,
-      host:   false,
-      joined: Date.now()
-    });
-
-    enterLobby();
-
-  } catch(e){
-    setErr('homeErr','❌ هەڵە: ' + e.message);
-  }
-};
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-//  LOBBY  ← THIS IS WHERE THE BUG WAS
-//  We set up a LIVE onValue listener on /players
-//  so the list updates the INSTANT anyone joins or leaves
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function enterLobby(){
-  clearListeners();
-  stopOnlineTimer();
-  myVoted = false;
-  myRevealed = false;
-
-  goPage('pgLobby');
-  document.getElementById('lobCode').innerText = roomCode;
-
-  // Reset result area in case we came back from a game
-  document.getElementById('gameRes').style.display  = 'none';
-  document.getElementById('gameEnd').style.display  = 'none';
-
-  // Show/hide host vs guest controls
-  document.getElementById('hostArea').style.display  = isHost ? 'block' : 'none';
-  document.getElementById('guestArea').style.display = isHost ? 'none'  : 'block';
-
-  // ══════════════════════════════════════════
-  //  LISTENER 1: /players — updates player list LIVE
-  //  This fires immediately (shows current players)
-  //  AND fires again every time someone joins or leaves
-  // ══════════════════════════════════════════
-  listen(`rooms/${roomCode}/players`, (snap)=>{
-    const players = snap.val() || {};
-    const entries = Object.entries(players);
-
-    // Update count
-    document.getElementById('lobCount').innerText = entries.length;
-
-    // Render player list
-    const listEl = document.getElementById('lobList');
-    listEl.innerHTML = '';
-
-    if(entries.length === 0){
-      listEl.innerHTML = '<p class="status">هیچ پلەیەرێک نییە</p>';
-      return;
-    }
-
-    entries
-      .sort((a,b)=> (a[1].joined||0) - (b[1].joined||0))
-      .forEach(([id, p])=>{
-        const div = document.createElement('div');
-        div.className = 'pitem';
-        div.innerHTML = `
-          <div class="pleft">
-            <div class="pdot"></div>
-            <span class="pname">${p.name}</span>
-            <div class="badges">
-              ${p.host     ? '<span class="badge bhost">هۆست</span>' : ''}
-              ${id===myId  ? '<span class="badge bme">تۆ</span>'     : ''}
-            </div>
-          </div>
-          ${isHost && id!==myId
-            ? `<button class="kick-btn" onclick="kickPlayer('${id}','${p.name}')">❌</button>`
-            : ''}
-        `;
-        listEl.appendChild(div);
-      });
-
-    // Update start button for host
-    if(isHost){
-      const canStart = entries.length >= 2;
-      document.getElementById('startBtn').disabled = !canStart;
-      document.getElementById('hostHint').innerText = canStart
-        ? `✅ ${entries.length} پلەیەر ئامادەن`
-        : '⚠️ کەمترین ٢ پلەیەر پێویستە';
-    }
-  });
-
-  // ══════════════════════════════════════════
-  //  LISTENER 2: /status — navigate when game starts or resets
-  // ══════════════════════════════════════════
-  listen(`rooms/${roomCode}/status`, (snap)=>{
-    const status = snap.val();
-    if(status === 'reveal')  enterReveal();
-    if(status === 'playing') enterGame();
-  });
-
-  // ══════════════════════════════════════════
-  //  LISTENER 3: watch MY OWN player node
-  //  If it disappears → I was kicked by host
-  // ══════════════════════════════════════════
-  listen(`rooms/${roomCode}/players/${myId}`, (snap)=>{
-    if(!snap.exists()){
-      clearListeners();
-      stopOnlineTimer();
-      myId=''; roomCode=''; isHost=false;
-      goPage('pgOnline');
-      toast('❌ هۆستەکە تۆی دەریکرد');
-    }
-  });
-}
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-//  COPY CODE
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-window.copyCode = function(){
-  navigator.clipboard.writeText(roomCode).catch(()=>{});
-  const el = document.getElementById('copyOk');
-  el.innerText = '✅ کۆپی کرا!';
-  setTimeout(()=> el.innerText='', 2200);
-};
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-//  KICK PLAYER (host only)
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-window.kickPlayer = async function(id, name){
-  if(!isHost) return;
-  if(!confirm(`دەتەوێت ${name} دەری بکەیت؟`)) return;
-  try {
-    await remove(ref(db, `rooms/${roomCode}/players/${id}`));
-    toast(`✅ ${name} دەرکرا`);
-  } catch(e){ setErr('lobErr','❌ '+e.message); }
-};
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-//  HOST START GAME
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-window.hostStart = async function(){
-  if(!isHost) return;
-  setErr('lobErr','');
-
-  try {
-    // Get latest players snapshot
-    const pSnap    = await get(ref(db, `rooms/${roomCode}/players`));
-    const settSnap = await get(ref(db, `rooms/${roomCode}/settings`));
-    const players  = pSnap.val() || {};
-    const settings = settSnap.val() || {};
-    const pIds     = Object.keys(players);
-    const spyCnt   = settings.spies || 1;
-
-    if(pIds.length < 2)       { setErr('lobErr','⚠️ کەمترین ٢ پلەیەر پێویستە'); return; }
-    if(spyCnt >= pIds.length) { setErr('lobErr','⚠️ ژمارەی جاسوس زیادتره'); return; }
-
-    // Randomly assign spies
-    const shuffled = [...pIds].sort(()=> Math.random()-0.5);
-    const spyIds   = shuffled.slice(0, spyCnt);
-    const roles    = {};
-    pIds.forEach(id=> roles[id] = spyIds.includes(id) ? 'spy' : 'normal');
-
-    const secret = pickSecret();
-
-    // Write game data then change status to 'reveal'
-    // All clients' status listeners will fire and navigate to reveal screen
-    await update(ref(db, `rooms/${roomCode}`), {
-      roles,
-      spies:        spyIds,
-      secret,
-      readyCnt:     0,
-      totalPlayers: pIds.length,
-      result:       null,
-      status:       'reveal'   // ← this triggers navigation for ALL players
-    });
-
-  } catch(e){ setErr('lobErr','❌ '+e.message); }
-};
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-//  ENTER REVEAL
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-async function enterReveal(){
-  clearListeners();
-  myRevealed = false;
-  goPage('pgReveal');
-
-  document.getElementById('rvTitle').innerText       = `👤 ${myName}`;
-  document.getElementById('rvBtn').disabled          = false;
-  document.getElementById('rvCard').style.display    = 'none';
-  document.getElementById('rvWait').style.display    = 'none';
-  document.getElementById('rvReady').innerText       = '0';
-
-  try {
-    // Fetch my role and secret word
-    const [rSnap, sSnap, tSnap] = await Promise.all([
-      get(ref(db, `rooms/${roomCode}/roles/${myId}`)),
-      get(ref(db, `rooms/${roomCode}/secret`)),
-      get(ref(db, `rooms/${roomCode}/totalPlayers`))
-    ]);
-    myRole = rSnap.val() || 'normal';
-    const sec = sSnap.val() || {};
-    myWord = sec.word || '';
-    myCat  = sec.cat  || '';
-    myHint = sec.hint || '';
-    document.getElementById('rvTotal').innerText = tSnap.val() || '?';
-  } catch(e){ console.warn('reveal fetch err:', e); }
-
-  // Listen to readyCnt so counter updates live
-  listen(`rooms/${roomCode}/readyCnt`, (snap)=>{
-    document.getElementById('rvReady').innerText = snap.val() || 0;
-  });
-
-  // Listen for status change to 'playing'
-  listen(`rooms/${roomCode}/status`, (snap)=>{
-    if(snap.val() === 'playing') enterGame();
-  });
-}
-
-window.doReveal = async function(){
-  if(myRevealed) return;
-  myRevealed = true;
-  document.getElementById('rvBtn').disabled = true;
-
-  const el = document.getElementById('rvCard');
-  el.style.display = 'block';
-  if(myRole === 'spy'){
-    el.innerHTML = `<div class="rcard rspy">
-      <span class="em">🕵️</span>
-      تۆ <b>جاسوسیت!</b>
-      <span class="wd">جۆر: ${myCat}</span>
-      <small>وشەی نهێنی نازانیت — زیرەکانە!</small>
-    </div>`;
-  } else {
-    el.innerHTML = `<div class="rcard rnorm">
-      <span class="em">✅</span>
-      تۆ <b>شارەزایی!</b>
-      <span class="wd">📌 ${myWord}</span>
-      <small>ئەم وشەیە بپارێزە!</small>
-    </div>`;
-  }
-  document.getElementById('rvWait').style.display = 'block';
-
-  try {
-    // Atomically increment readyCnt
-    const cSnap = await get(ref(db, `rooms/${roomCode}/readyCnt`));
-    const tSnap = await get(ref(db, `rooms/${roomCode}/totalPlayers`));
-    const newCnt = (cSnap.val() || 0) + 1;
-    const total  = tSnap.val() || 0;
-
-    await set(ref(db, `rooms/${roomCode}/readyCnt`), newCnt);
-
-    // Host checks if everyone is ready and starts the game
-    if(isHost && newCnt >= total){
-      await update(ref(db, `rooms/${roomCode}`), { status: 'playing' });
-    }
-  } catch(e){ console.warn('ready err:', e); }
-};
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-//  ENTER GAME
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-async function enterGame(){
-  clearListeners();
-  myVoted = false;
-  goPage('pgGame');
-
-  document.getElementById('hintBox').style.display  = 'none';
-  document.getElementById('gameRes').style.display  = 'none';
-  document.getElementById('gameEnd').style.display  = 'none';
-  document.getElementById('vMsg').innerText          = '';
-  document.getElementById('gtimer').classList.remove('red');
-
-  // Role reminder card
-  const roleEl = document.getElementById('gameRole');
-  if(myRole === 'spy'){
-    roleEl.className = 'rcard rspy';
-    roleEl.innerHTML = `🕵️ تۆ <b>جاسوسیت</b> — جۆر: <b>${myCat}</b>`;
-  } else {
-    roleEl.className = 'rcard rnorm';
-    roleEl.innerHTML = `📌 وشەکە: <b>${myWord}</b>`;
-  }
-
-  // Start countdown timer
-  let sett = {mins:5};
-  try { const s = await get(ref(db,`rooms/${roomCode}/settings`)); if(s.val()) sett=s.val(); } catch(e){}
-  let t = (sett.mins||5) * 60;
-  const half = Math.floor(t/2);
-  let hintShown = false;
-  updateClock(t);
-  stopOnlineTimer();
-  onlineTimerID = setInterval(()=>{
-    t--;
-    updateClock(t);
-    if(t<=10) document.getElementById('gtimer').classList.add('red');
-    if(!hintShown && t<=half){
-      hintShown=true;
-      const hb=document.getElementById('hintBox');
-      hb.style.display='block';
-      hb.innerHTML=`💡 <b>هینتی دووەم:</b> ${myHint}`;
-    }
-    if(t<=0) stopOnlineTimer();
-  },1000);
-
-  // Build vote buttons from player list
-  try {
-    const pSnap = await get(ref(db, `rooms/${roomCode}/players`));
-    const pls = pSnap.val() || {};
-    const grid = document.getElementById('vGrid');
-    grid.innerHTML = '';
-    Object.entries(pls)
-      .sort((a,b)=>(a[1].joined||0)-(b[1].joined||0))
-      .forEach(([id,p])=>{
-        const b = document.createElement('button');
-        b.className = 'vbtn';
-        b.innerText = `🧑 ${p.name}`;
-        b.onclick = ()=> castVote(id, p.name);
-        grid.appendChild(b);
-      });
-  } catch(e){ console.warn('vote build err:',e); }
-
-  // Listen for result (any player can submit vote)
-  listen(`rooms/${roomCode}/result`, (snap)=>{
-    if(snap.val()) showResult(snap.val());
-  });
-
-  // Listen for lobby reset (play again)
-  listen(`rooms/${roomCode}/status`, (snap)=>{
-    if(snap.val()==='lobby') enterLobby();
-  });
-}
-
-function updateClock(t){
-  const m = String(Math.floor(t/60)).padStart(2,'0');
-  const s = String(t%60).padStart(2,'0');
-  document.getElementById('gtimer').innerText = `⏱️ ${m}:${s}`;
-}
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-//  VOTE
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-window.castVote = async function(targetId, targetName){
-  if(myVoted) return;
-  myVoted = true;
-  stopOnlineTimer();
-  document.querySelectorAll('#vGrid .vbtn').forEach(b=>b.disabled=true);
-  document.getElementById('vMsg').innerText = `⌛ دەنگت دا بۆ ${targetName}...`;
-
-  try {
-    const [spSnap, pSnap] = await Promise.all([
-      get(ref(db, `rooms/${roomCode}/spies`)),
-      get(ref(db, `rooms/${roomCode}/players`))
-    ]);
-    const spies    = spSnap.val() || [];
-    const players  = pSnap.val()  || {};
-    const caught   = spies.includes(targetId);
-    const spyNames = spies.map(id=> players[id]?.name||'?').join('، ');
-
-    await set(ref(db, `rooms/${roomCode}/result`), {
-      votedId: targetId, votedName: targetName, caught, spyNames
-    });
-  } catch(e){
-    myVoted = false;
-    document.getElementById('vMsg').innerText = '❌ هەڵە: '+e.message;
-    document.querySelectorAll('#vGrid .vbtn').forEach(b=>b.disabled=false);
-  }
-};
-
-function showResult(r){
-  if(document.getElementById('gameRes').style.display==='block') return;
-  stopOnlineTimer();
-  document.getElementById('vGrid').innerHTML='';
-  document.getElementById('vMsg').innerText='';
-  const el=document.getElementById('gameRes');
-  el.style.display='block';
-  if(r.caught){
-    el.className='resbox rwin';
-    el.innerHTML=`🎉 <b>سەرکەوتن!</b><br>جاسوس <b>${r.votedName}</b> دەستگیر کرا!<br>
-      <small style="opacity:.7">جاسوسەکان: ${r.spyNames}</small><br>
-      <small style="opacity:.7">وشەی نهێنی: <b style="color:var(--gold)">${myRole!=='spy'?myWord:'—'}</b></small>`;
-  } else {
-    el.className='resbox rlose';
-    el.innerHTML=`😈 <b>جاسوسەکە بردی!</b><br>دەنگ دەدرا بۆ <b>${r.votedName}</b><br>
-      <small style="opacity:.7">جاسوسەکان: ${r.spyNames}</small><br>
-      <small style="opacity:.7">وشەی نهێنی: <b style="color:var(--gold)">${myRole!=='spy'?myWord:'—'}</b></small>`;
-  }
-  document.getElementById('gameEnd').style.display='block';
-}
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-//  PLAY AGAIN
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-window.playAgain = async function(){
-  if(!isHost){ toast('⏳ تەنها هۆست دەتوانێت دووبارە دەستی پێبکات'); return; }
-  stopOnlineTimer();
-  try {
-    await update(ref(db, `rooms/${roomCode}`), {
-      status:'lobby', roles:null, spies:null, secret:null,
-      readyCnt:0, totalPlayers:0, result:null
-    });
-    // status listener in enterLobby fires and re-renders lobby
-  } catch(e){ console.warn(e); }
-};
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-//  LEAVE ROOM
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-window.leaveRoom = async function(){
-  clearListeners();
-  stopOnlineTimer();
-  const code=roomCode, id=myId;
-  myId=''; myName=''; roomCode=''; isHost=false;
-  myRole=''; myWord=''; myCat=''; myHint='';
-  goPage('pgOnline');
-  try { await remove(ref(db, `rooms/${code}/players/${id}`)); } catch(e){}
-};
-
-window.addEventListener('beforeunload',()=>{
-  if(roomCode && myId) remove(ref(db,`rooms/${roomCode}/players/${myId}`)).catch(()=>{});
-});
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-//  ██████  OFFLINE MODE  ██████
+//  OFFLINE SETUP
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 window.goOffline = function(){
-  offNameCount = 0;
+  offNameCount=0;
   document.getElementById('offNameList').innerHTML='';
   setErr('offErr','');
-  // Add 2 starter name inputs
   addOffName(); addOffName();
   goPage('pgOffline');
 };
 
-window.addOffName = function(){
-  const spyCnt  = parseInt(document.getElementById('offSpies').value)||1;
-  const current = offNameCount;
-  // Max 20 names
-  if(current >= 20){ toast('زیاتر لە ٢٠ پلەیەر ناکرێت'); return; }
-
-  offNameCount++;
-  const div = document.createElement('div');
-  div.id = `offNameDiv_${current}`;
-  div.style.marginTop = '10px';
-  div.innerHTML = `
-    <span class="flabel">👤 پلەیەری ${current+1}</span>
-    <input type="text" id="offN_${current}" maxlength="14" placeholder="ناوی پلەیەری ${current+1}">`;
-  document.getElementById('offNameList').appendChild(div);
-
+function updateStartBtn(){
   document.getElementById('offStartBtn').disabled = offNameCount < 2;
+}
+
+window.addOffName = function(){
+  if(offNameCount>=20){toast('زیاتر لە ٢٠ پلەیەر ناکرێت');return;}
+  const idx=offNameCount++;
+  const div=document.createElement('div');
+  div.id=`offNameDiv_${idx}`;
+  div.innerHTML=`
+    <span class="flabel">👤 پلەیەری ${idx+1}</span>
+    <div class="name-row">
+      <input type="text" id="offN_${idx}" maxlength="14" placeholder="ناوی پلەیەری ${idx+1}">
+      <button class="del-btn" onclick="removeOffName(${idx})">✕</button>
+    </div>`;
+  document.getElementById('offNameList').appendChild(div);
+  updateStartBtn();
+};
+
+window.removeOffName = function(idx){
+  const div=document.getElementById(`offNameDiv_${idx}`);
+  if(div) div.remove();
+  // Recount visible inputs
+  const remaining=document.querySelectorAll('[id^="offN_"]').length;
+  offNameCount=remaining;
+  // Re-number labels
+  document.querySelectorAll('#offNameList > div').forEach((d,i)=>{
+    const lbl=d.querySelector('.flabel');
+    const inp=d.querySelector('input');
+    if(lbl) lbl.innerText=`👤 پلەیەری ${i+1}`;
+    if(inp) inp.placeholder=`ناوی پلەیەری ${i+1}`;
+  });
+  updateStartBtn();
 };
 
 window.startOffGame = function(){
-  const spyCnt = parseInt(document.getElementById('offSpies').value)||1;
-  const mins   = parseInt(document.getElementById('offMins').value)||5;
+  const spyCnt=parseInt(document.getElementById('offSpies').value)||1;
+  const mins  =parseInt(document.getElementById('offMins').value)||5;
 
-  // Collect names
-  const names = [];
-  for(let i=0; i<offNameCount; i++){
-    const inp = document.getElementById(`offN_${i}`);
-    if(!inp) continue;
-    const v = inp.value.trim();
-    if(!v){ setErr('offErr',`⚠️ ناوی پلەیەری ${i+1} بنووسە`); return; }
-    names.push(v);
-  }
-  if(names.length < 2){ setErr('offErr','⚠️ کەمترین ٢ پلەیەر'); return; }
-  if(spyCnt >= names.length){ setErr('offErr','⚠️ ژمارەی جاسوس زیادتره'); return; }
+  // Collect visible names
+  const names=[];
+  document.querySelectorAll('#offNameList input[type="text"]').forEach(inp=>{
+    const v=inp.value.trim();
+    if(v) names.push(v);
+    else if(!v){
+      inp.focus();
+      setErr('offErr','⚠️ هەموو ناوەکان پڕ بکەرەوە');
+    }
+  });
+
+  if(names.length<2){setErr('offErr','⚠️ کەمترین ٢ پلەیەر');return;}
+  if(spyCnt>=names.length){setErr('offErr','⚠️ ژمارەی جاسوس زیادتره');return;}
+
+  // Check for blank names
+  const allFilled=Array.from(document.querySelectorAll('#offNameList input[type="text"]')).every(i=>i.value.trim());
+  if(!allFilled){setErr('offErr','⚠️ هەموو ناوەکان پڕ بکەرەوە');return;}
   setErr('offErr','');
 
-  offSecret = pickSecret();
-  offSecret._mins = mins;
+  offSecret=pickSecret();
+  offSecret._mins=mins;
 
-  // Assign roles
-  const indices = names.map((_,i)=>i);
-  const shuffled = [...indices].sort(()=>Math.random()-0.5);
-  const spyIdx = shuffled.slice(0, spyCnt);
+  const shuffled=[...names.keys()].sort(()=>Math.random()-0.5);
+  const spyIdx=shuffled.slice(0,spyCnt);
 
-  offPlayers = names.map((name,i)=>({
-    name,
-    isSpy: spyIdx.includes(i)
-  }));
-
-  offCurIdx = 0;
+  offPlayers=names.map((name,i)=>({name, isSpy:spyIdx.includes(i)}));
+  offCurIdx=0;
   showOffCover();
 };
 
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  OFFLINE REVEAL
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function showOffCover(){
-  if(offCurIdx >= offPlayers.length){
-    // All done — start game
+  if(offCurIdx>=offPlayers.length){
     document.getElementById('offOverlay').classList.remove('on');
     launchOffGame();
     return;
   }
-  const p = offPlayers[offCurIdx];
+  const p=offPlayers[offCurIdx];
   document.getElementById('offOverlay').classList.add('on');
-  document.getElementById('offStepLbl').innerText = `گامی ${offCurIdx+1} لە ${offPlayers.length}`;
-  document.getElementById('offPName').innerText   = `👤 ${p.name}`;
-  document.getElementById('offRevBtn').style.display  = 'block';
-  document.getElementById('offRevBtn').disabled       = false;
-  document.getElementById('offRoleCard').style.display= 'none';
-  document.getElementById('offRoleCard').innerHTML    = '';
-  document.getElementById('offNextBtn').style.display = 'none';
-  offRevealed = false;
+  document.getElementById('offStepLbl').innerText=`گامی ${offCurIdx+1} لە ${offPlayers.length}`;
+  document.getElementById('offPName').innerText=`👤 ${p.name}`;
+  document.getElementById('offRevBtn').style.display='block';
+  document.getElementById('offRevBtn').disabled=false;
+  document.getElementById('offRoleCard').style.display='none';
+  document.getElementById('offRoleCard').innerHTML='';
+  document.getElementById('offNextBtn').style.display='none';
+  offRevealed=false;
 }
 
-window.showOffRole = function(){
-  if(offRevealed) return;
-  offRevealed = true;
-  const p = offPlayers[offCurIdx];
-  document.getElementById('offRevBtn').style.display = 'none';
-  const el = document.getElementById('offRoleCard');
-  el.style.display = 'block';
+window.showOffRole=function(){
+  if(offRevealed)return;
+  offRevealed=true;
+  const p=offPlayers[offCurIdx];
+  document.getElementById('offRevBtn').style.display='none';
+  const el=document.getElementById('offRoleCard');
+  el.style.display='block';
   if(p.isSpy){
-    el.innerHTML = `<div class="rcard rspy">
+    el.innerHTML=`<div class="rcard rspy">
       <span class="em">🕵️</span>
-      تۆ <b>جاسوسیت!</b>
+      تۆ <strong>جاسوسیت!</strong>
       <span class="wd">جۆر: ${offSecret.cat}</span>
-      <small>وشەی نهێنی نازانیت!</small>
+      <small>وشەی نهێنی نازانیت — زیرەکانە!</small>
     </div>`;
   } else {
-    el.innerHTML = `<div class="rcard rnorm">
+    el.innerHTML=`<div class="rcard rnorm">
       <span class="em">✅</span>
-      تۆ <b>شارەزایی!</b>
+      تۆ <strong>شارەزایی!</strong>
       <span class="wd">📌 ${offSecret.word}</span>
       <small>ئەم وشەیە بپارێزە!</small>
     </div>`;
   }
-  document.getElementById('offNextBtn').style.display = 'block';
+  document.getElementById('offNextBtn').style.display='block';
 };
 
-window.nextOffPlayer = function(){
-  offCurIdx++;
-  showOffCover();
-};
+window.nextOffPlayer=function(){offCurIdx++;showOffCover();};
 
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  OFFLINE GAME
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function launchOffGame(){
   goPage('pgOffGame');
-  document.getElementById('offHint').style.display = 'none';
-  document.getElementById('offRes').style.display  = 'none';
-  document.getElementById('offEnd').style.display  = 'none';
-  document.getElementById('offVMsg').innerText      = '';
+  document.getElementById('offHint').style.display='none';
+  document.getElementById('offRes').style.display='none';
+  document.getElementById('offEnd').style.display='none';
+  document.getElementById('offVMsg').innerText='';
   document.getElementById('offtimer').classList.remove('red');
 
-  // Show category reminder (all players use same screen)
-  const roleEl = document.getElementById('offGameRole');
-  roleEl.className = 'rcard';
-  roleEl.style.cssText = 'background:rgba(255,255,255,.04);border:1px solid var(--border)';
-  roleEl.innerHTML = `🗣️ <b>کاتی گفتوگۆ!</b><br>
-    <small style="color:var(--muted)">جۆر: <b style="color:var(--gold)">${offSecret.cat}</b></small>`;
+  const roleEl=document.getElementById('offGameRole');
+  roleEl.className='rcard';
+  roleEl.style.cssText='background:rgba(255,255,255,.04);border:1px solid var(--border)';
+  roleEl.innerHTML=`🗣️ <strong>کاتی گفتوگۆ!</strong><br>
+    <small style="color:var(--muted)">جۆر: <strong style="color:var(--gold)">${offSecret.cat}</strong></small>`;
 
-  // Timer
-  const mins = offSecret._mins || 5;
-  let t = mins*60, half=Math.floor(t/2), hintShown=false;
+  const mins=offSecret._mins||5;
+  let t=mins*60, half=Math.floor(t/2), hintShown=false;
   updateOffClock(t);
   stopOffTimer();
-  offTimerID = setInterval(()=>{
+  offTimerID=setInterval(()=>{
     t--; updateOffClock(t);
     if(t<=10) document.getElementById('offtimer').classList.add('red');
-    if(!hintShown && t<=half){
+    if(!hintShown&&t<=half){
       hintShown=true;
       const hb=document.getElementById('offHint');
       hb.style.display='block';
-      hb.innerHTML=`💡 <b>هینتی دووەم:</b> ${offSecret.hint}`;
+      hb.innerHTML=`💡 <strong>هینتی دووەم:</strong> ${offSecret.hint}`;
     }
     if(t<=0) stopOffTimer();
   },1000);
 
-  // Vote buttons
-  const grid = document.getElementById('offVGrid');
+  const grid=document.getElementById('offVGrid');
   grid.innerHTML='';
   offPlayers.forEach((p,i)=>{
     const b=document.createElement('button');
@@ -1115,37 +429,34 @@ function updateOffClock(t){
   document.getElementById('offtimer').innerText=`⏱️ ${m}:${s}`;
 }
 
-window.offVote = function(idx,name){
+window.offVote=function(idx,name){
   stopOffTimer();
   document.querySelectorAll('#offVGrid .vbtn').forEach(b=>b.disabled=true);
   document.getElementById('offVMsg').innerText='';
 
-  const caught   = offPlayers[idx].isSpy;
-  const spyNames = offPlayers.filter(p=>p.isSpy).map(p=>p.name).join('، ');
+  const caught=offPlayers[idx].isSpy;
+  const spyNames=offPlayers.filter(p=>p.isSpy).map(p=>p.name).join('، ');
 
   const el=document.getElementById('offRes');
   el.style.display='block';
   if(caught){
     el.className='resbox rwin';
-    el.innerHTML=`🎉 <b>سەرکەوتن!</b><br>جاسوس <b>${name}</b> دەستگیر کرا!<br>
+    el.innerHTML=`🎉 <strong>سەرکەوتن!</strong><br>جاسوس <strong>${name}</strong> دەستگیر کرا!<br>
       <small style="opacity:.7">جاسوسەکان: ${spyNames}</small><br>
-      <small style="opacity:.7">وشەی نهێنی: <b style="color:var(--gold)">${offSecret.word}</b></small>`;
+      <small style="opacity:.7">وشەی نهێنی: <strong style="color:var(--gold)">${offSecret.word}</strong></small>`;
   } else {
     el.className='resbox rlose';
-    el.innerHTML=`😈 <b>جاسوسەکە بردی!</b><br>دەنگ دەدرا بۆ <b>${name}</b><br>
+    el.innerHTML=`😈 <strong>جاسوسەکە بردی!</strong><br>دەنگ دەدرا بۆ <strong>${name}</strong><br>
       <small style="opacity:.7">جاسوسەکان: ${spyNames}</small><br>
-      <small style="opacity:.7">وشەی نهێنی: <b style="color:var(--gold)">${offSecret.word}</b></small>`;
+      <small style="opacity:.7">وشەی نهێنی: <strong style="color:var(--gold)">${offSecret.word}</strong></small>`;
   }
   document.getElementById('offEnd').style.display='block';
 };
 
-window.restartOff = function(){
+window.restartOff=function(){
   stopOffTimer();
   goPage('pgOffline');
 };
-
 </script>
 </body>
 </html>
-
-
