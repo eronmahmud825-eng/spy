@@ -16,11 +16,6 @@
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 
-/* ═══ CRITICAL KURDISH FONT FIX ═══
-   Noto Naskh Arabic has perfect Kurdish/Arabic ligatures and glyph joining.
-   font-variant-ligatures:common-ligatures ensures letters connect properly.
-   text-rendering:optimizeLegibility activates OpenType features.
-*/
 body{
   font-family:'Noto Naskh Arabic','Tajawal',sans-serif;
   font-variant-ligatures:common-ligatures;
@@ -32,7 +27,6 @@ body{
   font-size:16px;line-height:1.6;
 }
 
-/* All text elements inherit proper Kurdish rendering */
 input,button,textarea,select{
   font-family:'Noto Naskh Arabic','Tajawal',sans-serif;
   font-variant-ligatures:common-ligatures;
@@ -114,7 +108,6 @@ input::placeholder{color:var(--muted)}
 #toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:var(--c2);border:1px solid var(--border);border-radius:12px;padding:11px 22px;font-size:13px;font-weight:700;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;z-index:9999;font-family:'Noto Naskh Arabic',sans-serif}
 #toast.show{opacity:1}
 
-/* Name input row */
 .name-row{display:flex;align-items:center;gap:8px;margin-top:8px}
 .name-row input{flex:1;margin:0}
 .del-btn{background:rgba(255,34,68,.12);border:1px solid rgba(255,34,68,.25);color:var(--red);border-radius:10px;padding:12px 14px;font-size:16px;cursor:pointer;flex-shrink:0;line-height:1}
@@ -130,7 +123,7 @@ input::placeholder{color:var(--muted)}
     <div class="ctitle">🕵️ یاری جاسوس</div>
     <p class="csub">یاری نهێنی — کێ جاسوسە؟</p>
     <div class="mode-grid">
-      <button class="mode-card" onclick="goOffline()">
+      <button class="mode-card" id="btnGoOffline">
         <span class="mode-icon">📱</span>
         <span class="mode-label">دەستپێکردنی یاری</span>
         <span class="mode-sub">یەک مۆبایل — هەموو پلەیەرەکان</span>
@@ -151,10 +144,10 @@ input::placeholder{color:var(--muted)}
     <div class="hr"></div>
     <p style="font-size:14px;color:var(--muted);margin-bottom:6px;font-family:'Noto Naskh Arabic',sans-serif">👤 ناوی پلەیەرەکان زیاد بکە (کەمترین ٢)</p>
     <div id="offNameList"></div>
-    <button class="btn bd" style="margin-top:12px" onclick="addOffName()">➕ زیادکردنی پلەیەر</button>
-    <button class="btn bp" id="offStartBtn" onclick="startOffGame()" style="margin-top:8px" disabled>🚀 دەستپێکردن</button>
+    <button class="btn bd" style="margin-top:12px" id="btnAddName">➕ زیادکردنی پلەیەر</button>
+    <button class="btn bp" id="offStartBtn" style="margin-top:8px" disabled>🚀 دەستپێکردن</button>
     <div id="offErr" class="err"></div>
-    <button class="btn bd" onclick="goPage('pgMenu')" style="margin-top:8px">← گەڕانەوە</button>
+    <button class="btn bd" id="btnBackMenu" style="margin-top:8px">← گەڕانەوە</button>
   </div>
 </div>
 
@@ -164,9 +157,9 @@ input::placeholder{color:var(--muted)}
     <div style="font-size:12px;color:var(--muted);margin-bottom:6px;font-family:'Noto Naskh Arabic',sans-serif" id="offStepLbl">گامی ١ لە ٦</div>
     <div class="big-pname" id="offPName">پلەیەری ١</div>
     <p class="csub" style="margin-bottom:18px">مۆبایلەکەت بگرە — تەنها تۆ ببینە!</p>
-    <button class="btn bp" id="offRevBtn" onclick="showOffRole()">👁️ پیشاندانی ڕۆڵ</button>
+    <button class="btn bp" id="offRevBtn">👁️ پیشاندانی ڕۆڵ</button>
     <div id="offRoleCard" style="display:none;margin-top:14px"></div>
-    <button class="btn bg" id="offNextBtn" onclick="nextOffPlayer()" style="display:none;margin-top:12px">➡️ داهاتوو</button>
+    <button class="btn bg" id="offNextBtn" style="display:none;margin-top:12px">➡️ داهاتوو</button>
   </div>
 </div>
 
@@ -182,8 +175,8 @@ input::placeholder{color:var(--muted)}
     <div class="vgrid" id="offVGrid"></div>
     <div id="offRes" style="display:none"></div>
     <div id="offEnd" style="display:none">
-      <button class="btn bg" onclick="restartOff()">🔄 یاری نوێ</button>
-      <button class="btn bd" onclick="goPage('pgMenu')" style="margin-top:8px">🏠 گەڕانەوە</button>
+      <button class="btn bg" id="btnRestart">🔄 یاری نوێ</button>
+      <button class="btn bd" id="btnEndMenu" style="margin-top:8px">🏠 گەڕانەوە</button>
     </div>
   </div>
 </div>
@@ -201,26 +194,8 @@ const WORDS = [
   {cat:"وەرزش",           hint:"چالاکییەکی جەستەیی",    items:["فوتبۆل","بەسکێتبۆل","تێنیس","شناکردن","والێبۆل","بۆکس","گۆڵف","تەکواندۆ"]},
   {cat:"فیلم",            hint:"فیلمێکی ناسراو",        items:["تایتانیک","ئەڤاتار","ئینسێپشن","ئینتەرستێلار","مەتریکس","گودفادەر","هاری پۆتەر","باتمان","سوپەرمان","جۆکەر","ئەڤنجەرز"]},
   {cat:"پیشە",            hint:"کارێکی مرۆڤ",           items:["دکتۆر","مامۆستا","ئەندازیار","پۆلیس","پەرستار","شۆفێر","وەرزشکار","نووسەر","دیزاینەر","دەلاڵ"]},
-
-  // ⚽ NEW: Football Teams
-  {cat:"تیمی فوتبۆل ⚽",  hint:"تیمێکی ناسراوی فوتبۆل", items:[
-    "مانچستەر سیتی","ڕیال مادرید","بارسەلۆنا","ئاک میلان","بایەرن موونیخ",
-    "لیڤەرپوول","مانچستەر یونایتد","چێلسی","ئارسنال","توتنهام",
-    "یووێنتووس","ئینتەر میلان","پاری سەن-ژەرمێن","بۆرووسیا دۆرتموند",
-    "ئاتلێتیکۆ مادرید","نەپۆلی","ئەیاکس","بنفیکا","پۆرتۆ","سەڤیا",
-    "ڤالێنسیا","ڤیاڕیال","لاتسیو","ڕۆما","فیۆرێنتینا",
-    "لێستەر سیتی","ئێڤەرتۆن","نیووکاسڵ","ئاستۆن ڤیلا","وێست هام"
-  ]},
-
-  // 🌟 NEW: Football Players
-  {cat:"یاریزانی فوتبۆل 🌟", hint:"یاریزانێکی ناسراوی فوتبۆل", items:[
-    "هالاند","مێسی","ڕۆنالدۆ","ئەمبابێ","نەیمار","مۆدریچ",
-    "ڤینیسیووس جوونیۆر","بێلینگهام","سالا","دی بروینە",
-    "لێواندۆوسکی","بێنزەما","ئیبراهیمۆڤیچ","نێیمار","سوناێ",
-    "تریپییەر","ڕاشفۆرد","سانچۆ","گریلیش","فۆدن",
-    "تیاگۆ ئالکانتارا","پێدری","گاڤی","بارسیا","یامال",
-    "ئۆسیمهێن","دیۆگۆ جۆتا","دارویین نوونیەز","کیلیان مبابێ","زیدان"
-  ]}
+  {cat:"تیمی فوتبۆل ⚽",  hint:"تیمێکی ناسراوی فوتبۆل", items:["مانچستەر سیتی","ڕیال مادرید","بارسەلۆنا","ئاک میلان","بایەرن موونیخ","لیڤەرپوول","مانچستەر یونایتد","چێلسی","ئارسنال","توتنهام","یووێنتووس","ئینتەر میلان","پاری سەن-ژەرمێن","بۆرووسیا دۆرتموند","ئاتلێتیکۆ مادرید","نەپۆلی","ئەیاکس","بنفیکا","پۆرتۆ","سەڤیا","ڤالێنسیا","ڤیاڕیال","لاتسیو","ڕۆما","فیۆرێنتینا","لێستەر سیتی","ئێڤەرتۆن","نیووکاسڵ","ئاستۆن ڤیلا","وێست هام"]},
+  {cat:"یاریزانی فوتبۆل 🌟", hint:"یاریزانێکی ناسراوی فوتبۆل", items:["هالاند","مێسی","ڕۆنالدۆ","ئەمبابێ","نەیمار","مۆدریچ","ڤینیسیووس جوونیۆر","بێلینگهام","سالا","دی بروینە","لێواندۆوسکی","بێنزەما","ئیبراهیمۆڤیچ","نێیمار","سوناێ","تریپییەر","ڕاشفۆرد","سانچۆ","گریلیش","فۆدن","تیاگۆ ئالکانتارا","پێدری","گاڤی","بارسیا","یامال","ئۆسیمهێن","دیۆگۆ جۆتا","دارویین نوونیەز","کیلیان مبابێ","زیدان"]}
 ];
 
 function pickSecret(){
@@ -241,7 +216,6 @@ function goPage(id){
   document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
   document.getElementById(id).classList.add('on');
 }
-window.goPage = goPage;
 
 function toast(msg){
   const e=document.getElementById('toast');
@@ -252,211 +226,240 @@ function setErr(id,m){const e=document.getElementById(id);if(e)e.innerText=m;}
 function stopOffTimer(){clearInterval(offTimerID);offTimerID=null;}
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  WIRE UP STATIC BUTTONS (safe — no Kurdish in onclick attrs)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+document.getElementById('btnGoOffline').addEventListener('click', goOffline);
+document.getElementById('btnAddName').addEventListener('click', addOffName);
+document.getElementById('offStartBtn').addEventListener('click', startOffGame);
+document.getElementById('btnBackMenu').addEventListener('click', ()=>goPage('pgMenu'));
+document.getElementById('offRevBtn').addEventListener('click', showOffRole);
+document.getElementById('offNextBtn').addEventListener('click', nextOffPlayer);
+document.getElementById('btnRestart').addEventListener('click', restartOff);
+document.getElementById('btnEndMenu').addEventListener('click', ()=>goPage('pgMenu'));
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 //  OFFLINE SETUP
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-window.goOffline = function(){
+function goOffline(){
   offNameCount=0;
   document.getElementById('offNameList').innerHTML='';
   setErr('offErr','');
   addOffName(); addOffName();
   goPage('pgOffline');
-};
+}
 
 function updateStartBtn(){
   document.getElementById('offStartBtn').disabled = offNameCount < 2;
 }
 
-window.addOffName = function(){
+function addOffName(){
   if(offNameCount>=20){toast('زیاتر لە ٢٠ پلەیەر ناکرێت');return;}
-  const idx=offNameCount++;
-  const div=document.createElement('div');
-  div.id=`offNameDiv_${idx}`;
-  div.innerHTML=`
-    <span class="flabel">👤 پلەیەری ${idx+1}</span>
-    <div class="name-row">
-      <input type="text" id="offN_${idx}" maxlength="14" placeholder="ناوی پلەیەری ${idx+1}">
-      <button class="del-btn" onclick="removeOffName(${idx})">✕</button>
-    </div>`;
+  const idx = offNameCount++;
+  const div = document.createElement('div');
+  div.id = `offNameDiv_${idx}`;
+
+  const lbl = document.createElement('span');
+  lbl.className = 'flabel';
+  lbl.textContent = `👤 پلەیەری ${idx+1}`;
+
+  const row = document.createElement('div');
+  row.className = 'name-row';
+
+  const inp = document.createElement('input');
+  inp.type = 'text';
+  inp.id = `offN_${idx}`;
+  inp.maxLength = 14;
+  inp.placeholder = `ناوی پلەیەری ${idx+1}`;
+
+  const delBtn = document.createElement('button');
+  delBtn.className = 'del-btn';
+  delBtn.textContent = '✕';
+  // ✅ FIX: addEventListener instead of onclick attr — no Kurdish text in attribute
+  delBtn.addEventListener('click', () => removeOffName(idx));
+
+  row.appendChild(inp);
+  row.appendChild(delBtn);
+  div.appendChild(lbl);
+  div.appendChild(row);
   document.getElementById('offNameList').appendChild(div);
   updateStartBtn();
-};
+}
 
-window.removeOffName = function(idx){
-  const div=document.getElementById(`offNameDiv_${idx}`);
+function removeOffName(idx){
+  const div = document.getElementById(`offNameDiv_${idx}`);
   if(div) div.remove();
-  // Recount visible inputs
-  const remaining=document.querySelectorAll('[id^="offN_"]').length;
-  offNameCount=remaining;
-  // Re-number labels
+  const remaining = document.querySelectorAll('#offNameList input[type="text"]').length;
+  offNameCount = remaining;
   document.querySelectorAll('#offNameList > div').forEach((d,i)=>{
-    const lbl=d.querySelector('.flabel');
-    const inp=d.querySelector('input');
-    if(lbl) lbl.innerText=`👤 پلەیەری ${i+1}`;
-    if(inp) inp.placeholder=`ناوی پلەیەری ${i+1}`;
+    const lbl = d.querySelector('.flabel');
+    const inp = d.querySelector('input');
+    if(lbl) lbl.textContent = `👤 پلەیەری ${i+1}`;
+    if(inp) inp.placeholder = `ناوی پلەیەری ${i+1}`;
   });
   updateStartBtn();
-};
+}
 
-window.startOffGame = function(){
-  const spyCnt=parseInt(document.getElementById('offSpies').value)||1;
-  const mins  =parseInt(document.getElementById('offMins').value)||5;
+function startOffGame(){
+  const spyCnt = parseInt(document.getElementById('offSpies').value)||1;
+  const mins   = parseInt(document.getElementById('offMins').value)||5;
 
-  // Collect visible names
-  const names=[];
+  const names = [];
+  let hasBlank = false;
   document.querySelectorAll('#offNameList input[type="text"]').forEach(inp=>{
-    const v=inp.value.trim();
+    const v = inp.value.trim();
     if(v) names.push(v);
-    else if(!v){
-      inp.focus();
-      setErr('offErr','⚠️ هەموو ناوەکان پڕ بکەرەوە');
-    }
+    else hasBlank = true;
   });
 
-  if(names.length<2){setErr('offErr','⚠️ کەمترین ٢ پلەیەر');return;}
-  if(spyCnt>=names.length){setErr('offErr','⚠️ ژمارەی جاسوس زیادتره');return;}
-
-  // Check for blank names
-  const allFilled=Array.from(document.querySelectorAll('#offNameList input[type="text"]')).every(i=>i.value.trim());
-  if(!allFilled){setErr('offErr','⚠️ هەموو ناوەکان پڕ بکەرەوە');return;}
+  if(names.length < 2){setErr('offErr','⚠️ کەمترین ٢ پلەیەر');return;}
+  if(hasBlank){setErr('offErr','⚠️ هەموو ناوەکان پڕ بکەرەوە');return;}
+  if(spyCnt >= names.length){setErr('offErr','⚠️ ژمارەی جاسوس زیادتره');return;}
   setErr('offErr','');
 
-  offSecret=pickSecret();
-  offSecret._mins=mins;
+  offSecret = pickSecret();
+  offSecret._mins = mins;
 
-  const shuffled=[...names.keys()].sort(()=>Math.random()-0.5);
-  const spyIdx=shuffled.slice(0,spyCnt);
+  const shuffled = [...names.keys()].sort(()=>Math.random()-0.5);
+  const spyIdx   = shuffled.slice(0, spyCnt);
 
-  offPlayers=names.map((name,i)=>({name, isSpy:spyIdx.includes(i)}));
-  offCurIdx=0;
+  offPlayers = names.map((name,i)=>({name, isSpy: spyIdx.includes(i)}));
+  offCurIdx  = 0;
   showOffCover();
-};
+}
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 //  OFFLINE REVEAL
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function showOffCover(){
-  if(offCurIdx>=offPlayers.length){
+  if(offCurIdx >= offPlayers.length){
     document.getElementById('offOverlay').classList.remove('on');
     launchOffGame();
     return;
   }
-  const p=offPlayers[offCurIdx];
+  const p = offPlayers[offCurIdx];
   document.getElementById('offOverlay').classList.add('on');
-  document.getElementById('offStepLbl').innerText=`گامی ${offCurIdx+1} لە ${offPlayers.length}`;
-  document.getElementById('offPName').innerText=`👤 ${p.name}`;
-  document.getElementById('offRevBtn').style.display='block';
-  document.getElementById('offRevBtn').disabled=false;
-  document.getElementById('offRoleCard').style.display='none';
-  document.getElementById('offRoleCard').innerHTML='';
-  document.getElementById('offNextBtn').style.display='none';
-  offRevealed=false;
+  document.getElementById('offStepLbl').textContent = `گامی ${offCurIdx+1} لە ${offPlayers.length}`;
+  document.getElementById('offPName').textContent   = `👤 ${p.name}`;
+  document.getElementById('offRevBtn').style.display  = 'block';
+  document.getElementById('offRevBtn').disabled       = false;
+  document.getElementById('offRoleCard').style.display = 'none';
+  document.getElementById('offRoleCard').innerHTML     = '';
+  document.getElementById('offNextBtn').style.display  = 'none';
+  offRevealed = false;
 }
 
-window.showOffRole=function(){
-  if(offRevealed)return;
-  offRevealed=true;
-  const p=offPlayers[offCurIdx];
-  document.getElementById('offRevBtn').style.display='none';
-  const el=document.getElementById('offRoleCard');
-  el.style.display='block';
+function showOffRole(){
+  if(offRevealed) return;
+  offRevealed = true;
+  const p  = offPlayers[offCurIdx];
+  document.getElementById('offRevBtn').style.display = 'none';
+  const el = document.getElementById('offRoleCard');
+  el.style.display = 'block';
+
   if(p.isSpy){
-    el.innerHTML=`<div class="rcard rspy">
+    el.innerHTML = `<div class="rcard rspy">
       <span class="em">🕵️</span>
       تۆ <strong>جاسوسیت!</strong>
       <span class="wd">جۆر: ${offSecret.cat}</span>
       <small>وشەی نهێنی نازانیت — زیرەکانە!</small>
     </div>`;
   } else {
-    el.innerHTML=`<div class="rcard rnorm">
+    el.innerHTML = `<div class="rcard rnorm">
       <span class="em">✅</span>
       تۆ <strong>شارەزایی!</strong>
       <span class="wd">📌 ${offSecret.word}</span>
       <small>ئەم وشەیە بپارێزە!</small>
     </div>`;
   }
-  document.getElementById('offNextBtn').style.display='block';
-};
+  document.getElementById('offNextBtn').style.display = 'block';
+}
 
-window.nextOffPlayer=function(){offCurIdx++;showOffCover();};
+function nextOffPlayer(){
+  offCurIdx++;
+  showOffCover();
+}
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 //  OFFLINE GAME
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function launchOffGame(){
   goPage('pgOffGame');
-  document.getElementById('offHint').style.display='none';
-  document.getElementById('offRes').style.display='none';
-  document.getElementById('offEnd').style.display='none';
-  document.getElementById('offVMsg').innerText='';
+  document.getElementById('offHint').style.display = 'none';
+  document.getElementById('offRes').style.display  = 'none';
+  document.getElementById('offEnd').style.display  = 'none';
+  document.getElementById('offVMsg').textContent   = '';
   document.getElementById('offtimer').classList.remove('red');
 
-  const roleEl=document.getElementById('offGameRole');
-  roleEl.className='rcard';
-  roleEl.style.cssText='background:rgba(255,255,255,.04);border:1px solid var(--border)';
-  roleEl.innerHTML=`🗣️ <strong>کاتی گفتوگۆ!</strong><br>
+  const roleEl = document.getElementById('offGameRole');
+  roleEl.className   = 'rcard';
+  roleEl.style.cssText = 'background:rgba(255,255,255,.04);border:1px solid var(--border)';
+  roleEl.innerHTML   = `🗣️ <strong>کاتی گفتوگۆ!</strong><br>
     <small style="color:var(--muted)">جۆر: <strong style="color:var(--gold)">${offSecret.cat}</strong></small>`;
 
-  const mins=offSecret._mins||5;
-  let t=mins*60, half=Math.floor(t/2), hintShown=false;
+  const mins = offSecret._mins || 5;
+  let t = mins * 60, half = Math.floor(t/2), hintShown = false;
   updateOffClock(t);
   stopOffTimer();
-  offTimerID=setInterval(()=>{
+  offTimerID = setInterval(()=>{
     t--; updateOffClock(t);
-    if(t<=10) document.getElementById('offtimer').classList.add('red');
-    if(!hintShown&&t<=half){
-      hintShown=true;
-      const hb=document.getElementById('offHint');
-      hb.style.display='block';
-      hb.innerHTML=`💡 <strong>هینتی دووەم:</strong> ${offSecret.hint}`;
+    if(t <= 10) document.getElementById('offtimer').classList.add('red');
+    if(!hintShown && t <= half){
+      hintShown = true;
+      const hb = document.getElementById('offHint');
+      hb.style.display = 'block';
+      hb.textContent   = `💡 هینتی دووەم: ${offSecret.hint}`;
     }
-    if(t<=0) stopOffTimer();
-  },1000);
+    if(t <= 0) stopOffTimer();
+  }, 1000);
 
-  const grid=document.getElementById('offVGrid');
-  grid.innerHTML='';
-  offPlayers.forEach((p,i)=>{
-    const b=document.createElement('button');
-    b.className='vbtn';
-    b.innerText=`🧑 ${p.name}`;
-    b.onclick=()=>offVote(i,p.name);
+  // ✅ FIX: Build vote buttons with addEventListener — Kurdish names are NOT put in onclick attrs
+  const grid = document.getElementById('offVGrid');
+  grid.innerHTML = '';
+  offPlayers.forEach((p, i)=>{
+    const b = document.createElement('button');
+    b.className   = 'vbtn';
+    b.textContent = `🧑 ${p.name}`;
+    // ✅ Capture i and p.name safely in closure — no attribute injection
+    b.addEventListener('click', () => offVote(i, p.name));
     grid.appendChild(b);
   });
 }
 
 function updateOffClock(t){
-  const m=String(Math.floor(t/60)).padStart(2,'0');
-  const s=String(t%60).padStart(2,'0');
-  document.getElementById('offtimer').innerText=`⏱️ ${m}:${s}`;
+  const m = String(Math.floor(t/60)).padStart(2,'0');
+  const s = String(t%60).padStart(2,'0');
+  document.getElementById('offtimer').textContent = `⏱️ ${m}:${s}`;
 }
 
-window.offVote=function(idx,name){
+function offVote(idx, name){
   stopOffTimer();
   document.querySelectorAll('#offVGrid .vbtn').forEach(b=>b.disabled=true);
-  document.getElementById('offVMsg').innerText='';
+  document.getElementById('offVMsg').textContent = '';
 
-  const caught=offPlayers[idx].isSpy;
-  const spyNames=offPlayers.filter(p=>p.isSpy).map(p=>p.name).join('، ');
+  const caught    = offPlayers[idx].isSpy;
+  const spyNames  = offPlayers.filter(p=>p.isSpy).map(p=>p.name).join('، ');
 
-  const el=document.getElementById('offRes');
-  el.style.display='block';
+  const el = document.getElementById('offRes');
+  el.style.display = 'block';
+
   if(caught){
-    el.className='resbox rwin';
-    el.innerHTML=`🎉 <strong>سەرکەوتن!</strong><br>جاسوس <strong>${name}</strong> دەستگیر کرا!<br>
+    el.className = 'resbox rwin';
+    el.innerHTML = `🎉 <strong>سەرکەوتن!</strong><br>جاسوس <strong>${name}</strong> دەستگیر کرا!<br>
       <small style="opacity:.7">جاسوسەکان: ${spyNames}</small><br>
       <small style="opacity:.7">وشەی نهێنی: <strong style="color:var(--gold)">${offSecret.word}</strong></small>`;
   } else {
-    el.className='resbox rlose';
-    el.innerHTML=`😈 <strong>جاسوسەکە بردی!</strong><br>دەنگ دەدرا بۆ <strong>${name}</strong><br>
+    el.className = 'resbox rlose';
+    el.innerHTML = `😈 <strong>جاسوسەکە بردی!</strong><br>دەنگ دەدرا بۆ <strong>${name}</strong><br>
       <small style="opacity:.7">جاسوسەکان: ${spyNames}</small><br>
       <small style="opacity:.7">وشەی نهێنی: <strong style="color:var(--gold)">${offSecret.word}</strong></small>`;
   }
-  document.getElementById('offEnd').style.display='block';
-};
+  document.getElementById('offEnd').style.display = 'block';
+}
 
-window.restartOff=function(){
+function restartOff(){
   stopOffTimer();
   goPage('pgOffline');
-};
+}
 </script>
 </body>
 </html>
