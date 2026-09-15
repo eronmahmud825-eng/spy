@@ -1,465 +1,1354 @@
 <!DOCTYPE html>
-<html lang="ku">
+<html lang="ku" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>🕵️ یاری جاسوس</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>کوئیز گەیم</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;600;700;800;900&family=Oxanium:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#070910;--c1:#0c1018;--c2:#111520;--c3:#161c2c;
-  --border:rgba(255,255,255,0.08);
-  --accent:#7b6fff;--green:#00d49a;--red:#ff2244;--gold:#ffc94d;
-  --muted:#566078;--text:#dde2f0;
+  --bg:#07080f; --surface:#0f1120;
+  --glass:rgba(255,255,255,.06); --gb:rgba(255,255,255,.11);
+  --gold:#f0b429; --red:#e63946; --blue:#1d4ed8;
+  --ok:#06d6a0; --ng:#e63946; --purple:#7c3aed;
+  --orange:#f97316; --cyan:#06b6d4; --pink:#ec4899;
+  --text:#f0f0f0; --muted:rgba(240,240,240,.45);
 }
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-
+*{margin:0;padding:0;box-sizing:border-box;}
 body{
-  font-family:'Noto Naskh Arabic','Tajawal',sans-serif;
-  font-variant-ligatures:common-ligatures;
-  font-feature-settings:"liga" 1,"calt" 1,"kern" 1;
-  text-rendering:optimizeLegibility;
+  font-family:'Noto Sans Arabic',sans-serif;
+  background:var(--bg); color:var(--text);
+  min-height:100vh; overflow-x:hidden; line-height:1.6;
   -webkit-font-smoothing:antialiased;
-  background:var(--bg);color:var(--text);
-  min-height:100vh;direction:rtl;overflow-x:hidden;
-  font-size:16px;line-height:1.6;
 }
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse 70% 50% at 15% 15%,rgba(230,57,70,.12),transparent 55%),
+             radial-gradient(ellipse 60% 45% at 85% 85%,rgba(29,78,216,.14),transparent 55%);}
+body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:
+    repeating-linear-gradient(0deg,transparent,transparent 48px,rgba(255,255,255,.012) 48px,rgba(255,255,255,.012) 49px),
+    repeating-linear-gradient(90deg,transparent,transparent 48px,rgba(255,255,255,.012) 48px,rgba(255,255,255,.012) 49px);}
 
-input,button,textarea,select{
-  font-family:'Noto Naskh Arabic','Tajawal',sans-serif;
-  font-variant-ligatures:common-ligatures;
-  font-feature-settings:"liga" 1,"calt" 1;
-  text-rendering:optimizeLegibility;
-}
+/* SCREENS */
+.screen{display:none;position:relative;z-index:1;min-height:100vh;padding:24px 16px 40px;
+  flex-direction:column;align-items:center;justify-content:center;animation:fi .35s ease;}
+.screen.active{display:flex;}
+@keyframes fi{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
 
-.pg{display:none;min-height:100vh;align-items:center;justify-content:center;padding:16px 14px 32px;flex-direction:column}
-.pg.on{display:flex}
+/* LOGO */
+.logo{text-align:center;margin-bottom:36px;}
+.logo h1{font-family:'Oxanium',sans-serif;font-size:clamp(2.2rem,7vw,4rem);font-weight:800;
+  letter-spacing:6px;
+  background:linear-gradient(135deg,#fff,var(--gold) 45%,var(--red));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 0 32px rgba(240,180,41,.4));}
+.logo p{font-size:.88rem;color:var(--muted);letter-spacing:8px;margin-top:6px;}
+#fb-status{
+  display:inline-block;font-size:.78rem;margin-top:12px;
+  padding:5px 16px;border-radius:50px;
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);
+  color:var(--gold);transition:color .4s;}
 
-.card{background:var(--c1);border:1px solid var(--border);border-radius:22px;padding:24px 20px;width:100%;max-width:430px}
-.ctitle{font-size:1.5rem;font-weight:900;margin-bottom:4px;font-family:'Noto Naskh Arabic',sans-serif;font-feature-settings:"liga" 1}
-.csub{color:var(--muted);font-size:14px;margin-bottom:20px;font-family:'Noto Naskh Arabic',sans-serif}
+/* BUTTONS */
+.btn{position:relative;padding:17px 30px;border:none;border-radius:14px;
+  font-family:'Noto Sans Arabic',sans-serif;font-size:1.08rem;font-weight:700;
+  cursor:pointer;overflow:hidden;transition:transform .2s,box-shadow .2s;}
+.btn::before{content:'';position:absolute;inset:0;
+  background:linear-gradient(160deg,rgba(255,255,255,.13),transparent);}
+.btn:hover{transform:translateY(-3px);}
+.btn:active{transform:translateY(1px);}
+.btn-red   {background:linear-gradient(135deg,#b91c2a,var(--red));  box-shadow:0 8px 28px rgba(230,57,70,.45);  color:#fff;}
+.btn-blue  {background:linear-gradient(135deg,#1034a6,var(--blue)); box-shadow:0 8px 28px rgba(29,78,216,.45);  color:#fff;}
+.btn-gold  {background:linear-gradient(135deg,#c28a00,var(--gold)); box-shadow:0 8px 28px rgba(240,180,41,.4);  color:#1a1000;}
+.btn-purple{background:linear-gradient(135deg,#5b21b6,var(--purple));box-shadow:0 8px 28px rgba(124,58,237,.45);color:#fff;}
+.mwrap{display:flex;flex-direction:column;gap:14px;width:100%;max-width:400px;}
 
-.flabel{display:block;font-size:13px;color:var(--muted);margin:14px 0 5px;font-family:'Noto Naskh Arabic',sans-serif}
-input{width:100%;padding:13px 15px;border-radius:12px;border:1.5px solid var(--border);background:var(--c2);color:var(--text);font-size:16px;outline:none;transition:border-color .2s}
-input:focus{border-color:var(--accent)}
-input::placeholder{color:var(--muted)}
+/* CARD */
+.card{background:var(--glass);border:1.5px solid var(--gb);border-radius:20px;
+  padding:28px;backdrop-filter:blur(20px);width:100%;max-width:560px;
+  box-shadow:0 20px 60px rgba(0,0,0,.5);}
+.card h2{font-size:1.4rem;font-weight:800;margin-bottom:20px;text-align:center;color:var(--gold);}
 
-.btn{display:block;width:100%;padding:15px;margin-top:12px;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;transition:transform .1s,opacity .15s;font-family:'Noto Naskh Arabic',sans-serif;font-feature-settings:"liga" 1}
-.btn:active{transform:scale(.97)}
-.btn:disabled{opacity:.3;cursor:not-allowed;transform:none!important}
-.bp{background:linear-gradient(135deg,#7b6fff,#5b4cdf);color:#fff}
-.bg{background:linear-gradient(135deg,#00d49a,#00a876);color:#041a12}
-.br{background:linear-gradient(135deg,#ff2244,#c00);color:#fff}
-.bd{background:var(--c2);color:var(--text);border:1px solid var(--border)}
-.bgold{background:linear-gradient(135deg,#ffc94d,#e6a800);color:#1a1000}
+/* FORM */
+.fg{margin-bottom:14px;}
+.fg label{display:block;font-size:.84rem;color:var(--muted);margin-bottom:6px;}
+.fg input,.fg select,.fg textarea{
+  width:100%;padding:12px 16px;
+  background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.1);
+  border-radius:10px;color:var(--text);
+  font-family:'Noto Sans Arabic',sans-serif;font-size:.97rem;outline:none;
+  transition:border-color .2s;}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--gold);}
+.fg select option{background:#111;color:#fff;}
+.fg textarea{resize:vertical;min-height:80px;}
 
-.mode-grid{display:grid;grid-template-columns:1fr;gap:12px;margin-top:6px}
-.mode-card{background:var(--c2);border:1.5px solid var(--border);border-radius:16px;padding:24px 14px;text-align:center;cursor:pointer;transition:all .2s;margin:0;width:100%;font-family:'Noto Naskh Arabic',sans-serif}
-.mode-card:hover{border-color:var(--accent);background:rgba(123,111,255,.08)}
-.mode-card:active{transform:scale(.97)}
-.mode-icon{font-size:2.4rem;display:block;margin-bottom:8px}
-.mode-label{font-size:16px;font-weight:900;display:block;color:var(--text);font-family:'Noto Naskh Arabic',sans-serif;font-feature-settings:"liga" 1}
-.mode-sub{font-size:13px;color:var(--muted);display:block;margin-top:3px;font-family:'Noto Naskh Arabic',sans-serif}
+/* PLAYER COUNT */
+.count-grid{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:8px 0 18px;}
+.cnt-btn{width:50px;height:50px;border-radius:12px;
+  border:2px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);
+  color:var(--text);font-family:'Oxanium',sans-serif;font-size:1.2rem;font-weight:700;
+  cursor:pointer;transition:all .2s;}
+.cnt-btn:hover,.cnt-btn.sel{border-color:var(--gold);background:rgba(240,180,41,.18);
+  color:var(--gold);box-shadow:0 0 14px rgba(240,180,41,.28);}
+.pname-list{display:flex;flex-direction:column;gap:9px;margin-bottom:16px;}
+.pname-row{display:flex;align-items:center;gap:10px;}
+.p-dot{width:13px;height:13px;border-radius:50%;flex-shrink:0;}
+.pname-row input{flex:1;padding:11px 14px;background:rgba(255,255,255,.07);
+  border:1.5px solid rgba(255,255,255,.1);border-radius:10px;color:var(--text);
+  font-family:'Noto Sans Arabic',sans-serif;font-size:.96rem;outline:none;transition:border-color .2s;}
+.pname-row input:focus{border-color:var(--gold);}
 
-.plist{margin-top:4px;min-height:40px}
-.pitem{display:flex;align-items:center;justify-content:space-between;background:var(--c2);border-radius:13px;padding:12px 14px;margin-bottom:8px;border:1px solid var(--border);animation:fadeup .25s ease}
-@keyframes fadeup{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
-.pleft{display:flex;align-items:center;gap:10px}
-.pdot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0}
-.pname{font-size:15px;font-weight:700;font-family:'Noto Naskh Arabic',sans-serif;font-feature-settings:"liga" 1}
+/* SCORE BAR */
+.sbar{display:flex;gap:7px;width:100%;max-width:860px;margin-bottom:16px;
+  flex-wrap:wrap;justify-content:center;}
+.sc{flex:1;min-width:72px;max-width:120px;padding:9px 10px;border-radius:12px;
+  text-align:center;background:var(--glass);border:2px solid transparent;transition:all .3s;}
+.sc.cur{border-color:rgba(255,255,255,.55);background:rgba(255,255,255,.09);
+  box-shadow:0 0 18px rgba(255,255,255,.1);transform:scale(1.05);}
+.sc .se{font-size:1rem;}
+.sc .sn{font-size:.68rem;color:var(--muted);margin:2px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sc .sp{font-family:'Oxanium',sans-serif;font-size:1.45rem;font-weight:800;color:var(--gold);}
+.sc .sb{font-size:.6rem;color:var(--red);min-height:12px;}
 
-.srow{display:flex;justify-content:space-between;align-items:center;font-size:14px;margin-bottom:10px}
-.srow-label{color:var(--muted);font-family:'Noto Naskh Arabic',sans-serif}
-.hr{height:1px;background:var(--border);margin:16px 0}
+/* TURN BANNER */
+.tbanner{padding:11px 28px;border-radius:50px;font-size:1rem;font-weight:800;
+  text-align:center;margin-bottom:16px;
+  border:2px solid rgba(255,255,255,.25);background:rgba(255,255,255,.07);}
 
-#offtimer{font-size:3rem;font-weight:700;text-align:center;letter-spacing:5px;padding:14px;border-radius:18px;background:var(--c2);border:1px solid var(--border);margin-bottom:14px;font-family:'Noto Naskh Arabic',sans-serif}
-#offtimer.red{color:var(--red);animation:blink 1s infinite}
-@keyframes blink{50%{opacity:.4}}
+/* CATEGORIES */
+.cgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;width:100%;max-width:780px;}
+@media(max-width:560px){.cgrid{grid-template-columns:repeat(2,1fr);}}
+.cbtn{padding:16px 8px;border:2px solid rgba(255,255,255,.09);border-radius:15px;
+  background:var(--glass);backdrop-filter:blur(14px);color:var(--text);
+  font-family:'Noto Sans Arabic',sans-serif;font-size:.9rem;font-weight:700;
+  cursor:pointer;text-align:center;transition:all .22s;}
+.cbtn .ci{font-size:1.6rem;display:block;margin-bottom:6px;}
+.cbtn .cl{display:flex;gap:4px;justify-content:center;margin-top:6px;flex-wrap:wrap;}
+.lb{padding:1px 7px;border-radius:20px;font-size:.68rem;font-weight:700;
+  font-family:'Oxanium',sans-serif;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);}
+.lb.used{background:rgba(230,57,70,.22);border-color:rgba(230,57,70,.45);
+  color:rgba(255,255,255,.32);text-decoration:line-through;}
+.lb.avail{background:rgba(29,78,216,.35);border-color:rgba(100,150,255,.5);color:#a0c0ff;}
+.cbtn:hover:not(.dis){border-color:var(--gold);background:rgba(240,180,41,.07);transform:translateY(-3px);}
+.cbtn.dis{opacity:.3;cursor:not-allowed;filter:grayscale(.5);}
 
-.rcard{border-radius:18px;padding:20px 16px;text-align:center;margin:12px 0;line-height:2;font-family:'Noto Naskh Arabic',sans-serif;font-feature-settings:"liga" 1}
-.rcard .em{font-size:2.4rem;display:block}
-.rcard .wd{font-size:1.9rem;font-weight:900;display:block;margin-top:2px;font-family:'Noto Naskh Arabic',sans-serif;font-feature-settings:"liga" 1}
-.rcard small{font-size:13px;opacity:.7;font-family:'Noto Naskh Arabic',sans-serif}
-.rspy{background:rgba(255,34,68,.15);border:1.5px solid var(--red)}
-.rnorm{background:rgba(0,212,154,.15);border:1.5px solid var(--green)}
+/* LEVEL PICKER */
+.lpwrap{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin:16px 0;}
+.lpbtn{padding:15px 34px;border-radius:14px;border:2px solid rgba(255,255,255,.16);
+  background:rgba(255,255,255,.05);color:var(--text);
+  font-family:'Oxanium',sans-serif;font-size:1.4rem;font-weight:800;
+  cursor:pointer;transition:all .2s;letter-spacing:2px;}
+.lpbtn:hover:not(:disabled){border-color:var(--gold);background:rgba(240,180,41,.1);
+  color:var(--gold);transform:scale(1.06);}
+.lpbtn:disabled{opacity:.22;cursor:not-allowed;}
 
-.hintbox{background:rgba(255,201,77,.08);border:1px solid rgba(255,201,77,.3);border-radius:12px;padding:11px 15px;font-size:14px;margin-bottom:12px;text-align:center;display:none;font-family:'Noto Naskh Arabic',sans-serif;font-feature-settings:"liga" 1}
+/* QUESTION */
+.qhdr{display:flex;justify-content:space-between;align-items:center;
+  width:100%;max-width:700px;margin-bottom:14px;flex-wrap:wrap;gap:7px;}
+.qbadge{padding:6px 16px;border-radius:50px;font-size:.8rem;font-weight:700;
+  border:1.5px solid;backdrop-filter:blur(8px);}
+.qcat   {border-color:rgba(255,255,255,.14);background:rgba(255,255,255,.07);color:var(--muted);}
+.qplayer{border-color:rgba(255,255,255,.22);background:rgba(255,255,255,.07);}
+.qpts   {border-color:rgba(240,180,41,.4);background:rgba(240,180,41,.12);
+  color:var(--gold);font-family:'Oxanium',sans-serif;}
 
-.vgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:10px}
-.vbtn{margin:0;padding:13px 8px;border-radius:14px;background:rgba(255,201,77,.07);border:1.5px solid rgba(255,201,77,.25);color:var(--gold);font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Naskh Arabic',sans-serif;font-feature-settings:"liga" 1;transition:background .15s}
-.vbtn:hover{background:rgba(255,201,77,.15)}
-.vbtn:disabled{opacity:.3;cursor:not-allowed}
+/* TIMER */
+.tw{position:relative;width:92px;height:92px;margin:0 auto 16px;}
+.ts{width:92px;height:92px;transform:rotate(-90deg);}
+.tbg{fill:none;stroke:rgba(255,255,255,.07);stroke-width:6;}
+.tf{fill:none;stroke:var(--gold);stroke-width:6;stroke-linecap:round;
+  stroke-dasharray:251.2;stroke-dashoffset:0;transition:stroke .5s;}
+.tn{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-family:'Oxanium',sans-serif;font-size:1.8rem;font-weight:800;}
+.curse-ring{position:absolute;inset:-4px;border-radius:50%;border:3px solid var(--red);
+  animation:pulse-red .8s infinite alternate;}
+@keyframes pulse-red{from{opacity:.4}to{opacity:1;box-shadow:0 0 0 8px rgba(230,57,70,0)}}
 
-.resbox{border-radius:18px;padding:20px 16px;text-align:center;font-size:1rem;line-height:2;margin:14px 0;font-family:'Noto Naskh Arabic',sans-serif;font-feature-settings:"liga" 1}
-.rwin{background:rgba(0,212,154,.1);border:1.5px solid var(--green)}
-.rlose{background:rgba(255,34,68,.1);border:1.5px solid var(--red)}
+.qtxt{background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.1);
+  border-radius:16px;padding:22px 24px;font-size:1.14rem;font-weight:700;
+  text-align:center;line-height:1.75;width:100%;max-width:700px;margin-bottom:14px;}
 
-.off-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);display:none;align-items:center;justify-content:center;z-index:100;padding:20px}
-.off-overlay.on{display:flex}
-.off-inner{background:var(--c1);border:1px solid var(--border);border-radius:22px;padding:28px 22px;width:100%;max-width:380px;text-align:center}
-.big-pname{font-size:1.8rem;font-weight:900;margin-bottom:4px;font-family:'Noto Naskh Arabic',sans-serif;font-feature-settings:"liga" 1}
+/* WAIT BANNER */
+.wbanner{display:none;align-items:center;justify-content:center;gap:14px;
+  padding:18px 28px;border-radius:18px;font-size:1.4rem;font-weight:900;
+  margin-bottom:14px;width:100%;max-width:700px;border:3px solid;
+  animation:fi .3s ease;}
+.wb-wait{border-color:rgba(167,139,250,.6);background:rgba(124,58,237,.15);color:#c4b5fd;}
+.wb-ok  {border-color:var(--ok);background:rgba(6,214,160,.14);color:#6effd8;}
+.wb-ng  {border-color:var(--ng);background:rgba(230,57,70,.14);color:#ffaaaa;}
 
-.status{text-align:center;color:var(--muted);font-size:13px;margin:8px 0;font-family:'Noto Naskh Arabic',sans-serif}
-.err{color:var(--red);text-align:center;font-size:13px;margin-top:8px;min-height:18px;font-family:'Noto Naskh Arabic',sans-serif}
-.ok{color:var(--green);text-align:center;font-size:12px;min-height:16px;font-family:'Noto Naskh Arabic',sans-serif}
+/* ANSWERS */
+.agrid{display:grid;grid-template-columns:1fr 1fr;gap:9px;width:100%;max-width:700px;}
+@media(max-width:440px){.agrid{grid-template-columns:1fr;}}
+.ab{padding:14px 15px;border-radius:12px;border:2px solid rgba(255,255,255,.11);
+  background:rgba(255,255,255,.05);color:var(--text);
+  font-family:'Noto Sans Arabic',sans-serif;font-size:.96rem;font-weight:600;
+  cursor:pointer;text-align:right;transition:all .18s;
+  display:flex;align-items:center;gap:10px;}
+.ab .al{font-family:'Oxanium',sans-serif;font-weight:800;font-size:.9rem;
+  width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.1);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;order:-1;}
+.ab:hover:not(:disabled){border-color:var(--blue);background:rgba(29,78,216,.18);transform:translateX(-3px);}
+.ab:disabled{cursor:default;}
+.ab.sel-wait{border-color:rgba(255,255,255,.5)!important;background:rgba(255,255,255,.12)!important;
+  animation:ab-pulse .8s infinite alternate;}
+@keyframes ab-pulse{from{box-shadow:0 0 8px rgba(255,255,255,.1)}to{box-shadow:0 0 22px rgba(255,255,255,.3)}}
+.ab.ok{border-color:var(--ok)!important;background:rgba(6,214,160,.14)!important;box-shadow:0 0 16px rgba(6,214,160,.28);}
+.ab.ok .al{background:var(--ok);}
+.ab.sw{border-color:var(--ng)!important;background:rgba(230,57,70,.18)!important;box-shadow:0 0 16px rgba(230,57,70,.28);}
+.ab.sw .al{background:var(--ng);}
+.ab.gone{opacity:.1;pointer-events:none;border-color:transparent!important;background:transparent!important;}
 
-#toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:var(--c2);border:1px solid var(--border);border-radius:12px;padding:11px 22px;font-size:13px;font-weight:700;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;z-index:9999;font-family:'Noto Naskh Arabic',sans-serif}
-#toast.show{opacity:1}
+/* POWERUP BAR */
+.pubar{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;
+  width:100%;max-width:700px;margin-bottom:12px;}
+.pu-btn{padding:7px 15px;border-radius:50px;border:2px solid;
+  font-family:'Noto Sans Arabic',sans-serif;font-size:.8rem;font-weight:700;
+  cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:5px;}
+.pu-btn:hover{transform:scale(1.05);}
+.pu-lifeline{border-color:rgba(124,58,237,.6);background:rgba(124,58,237,.14);color:#c49dff;}
 
-.name-row{display:flex;align-items:center;gap:8px;margin-top:8px}
-.name-row input{flex:1;margin:0}
-.del-btn{background:rgba(255,34,68,.12);border:1px solid rgba(255,34,68,.25);color:var(--red);border-radius:10px;padding:12px 14px;font-size:16px;cursor:pointer;flex-shrink:0;line-height:1}
-.del-btn:hover{background:rgba(255,34,68,.22)}
+/* MARKET */
+.mkt-pts{padding:10px 20px;border-radius:50px;background:rgba(240,180,41,.1);
+  border:1.5px solid rgba(240,180,41,.3);font-size:.88rem;color:var(--muted);
+  margin-bottom:18px;text-align:center;}
+.mkt-pts strong{font-family:'Oxanium',sans-serif;color:var(--gold);font-size:1.1rem;}
+.mktgrid{display:grid;grid-template-columns:1fr 1fr;gap:13px;width:100%;max-width:620px;}
+@media(max-width:460px){.mktgrid{grid-template-columns:1fr;}}
+.mcard{padding:18px 14px;border-radius:16px;border:2px solid;text-align:center;
+  cursor:pointer;transition:all .22s;position:relative;overflow:hidden;}
+.mcard::before{content:'';position:absolute;inset:0;
+  background:linear-gradient(160deg,rgba(255,255,255,.05),transparent);}
+.mcard:hover:not(.cant){transform:translateY(-3px);}
+.mcard.cant{opacity:.35;cursor:not-allowed;}
+.mcard.owned{cursor:default;}
+.mcard .mc-i{font-size:2rem;margin-bottom:7px;display:block;}
+.mcard .mc-n{font-size:.93rem;font-weight:800;margin-bottom:4px;}
+.mcard .mc-d{font-size:.72rem;color:var(--muted);margin-bottom:8px;line-height:1.55;}
+.mcard .mc-p{font-family:'Oxanium',sans-serif;font-size:1rem;font-weight:800;}
+.mc-life{border-color:rgba(124,58,237,.45);background:rgba(124,58,237,.08);}
+.mc-dbl {border-color:rgba(249,115,22,.45);background:rgba(249,115,22,.07);}
+.mc-time{border-color:rgba(6,182,212,.45); background:rgba(6,182,212,.07);}
+.mc-steal{border-color:rgba(230,57,70,.45);background:rgba(230,57,70,.07);}
+.mc-curse{border-color:rgba(236,72,153,.45);background:rgba(236,72,153,.07);}
+
+/* TARGET PICKER */
+.tlist{display:flex;flex-direction:column;gap:9px;margin:12px 0;width:100%;max-width:400px;}
+.tbtn{padding:13px 18px;border-radius:12px;border:2px solid rgba(255,255,255,.12);
+  background:var(--glass);color:var(--text);
+  font-family:'Noto Sans Arabic',sans-serif;font-size:.95rem;font-weight:700;
+  cursor:pointer;transition:all .2s;
+  display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.tbtn:hover{border-color:var(--red);background:rgba(230,57,70,.12);}
+
+/* RESULT OVERLAY */
+.ro{display:none;position:fixed;inset:0;z-index:200;
+  align-items:center;justify-content:center;
+  background:rgba(0,0,0,.75);backdrop-filter:blur(10px);}
+.ro.show{display:flex;animation:fi .3s ease;}
+.rb{padding:40px 52px;border-radius:24px;text-align:center;
+  box-shadow:0 30px 80px rgba(0,0,0,.65);max-width:420px;width:90%;}
+.rb.ok-b{background:linear-gradient(135deg,#003d22,#005a30);border:2px solid rgba(6,214,160,.6);}
+.rb.ng-b{background:linear-gradient(135deg,#3d0010,#5a0018);border:2px solid rgba(230,57,70,.6);}
+.ri{font-size:3.8rem;margin-bottom:10px;}
+.rt{font-size:1.8rem;font-weight:900;margin-bottom:6px;}
+.rp{font-family:'Oxanium',sans-serif;font-size:1.15rem;color:var(--gold);}
+.re{font-size:.82rem;color:var(--red);margin-top:8px;padding:6px 12px;
+  border-radius:8px;background:rgba(230,57,70,.15);border:1px solid rgba(230,57,70,.3);}
+
+/* FINAL */
+.podium{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;
+  margin:20px 0;width:100%;max-width:700px;}
+.pc{padding:20px 22px;border-radius:18px;text-align:center;min-width:120px;flex:1;max-width:165px;}
+.pc.win{background:linear-gradient(135deg,rgba(240,180,41,.15),rgba(240,180,41,.04));
+  border:2px solid rgba(240,180,41,.6);}
+.pc.los{background:var(--glass);border:2px solid var(--gb);}
+.pc .crown{font-size:2.2rem;margin-bottom:7px;}
+.pc .pname{font-size:1rem;font-weight:800;margin-bottom:5px;}
+.pc .pscore{font-family:'Oxanium',sans-serif;font-size:2.4rem;font-weight:800;color:var(--gold);}
+.pc .plbl{font-size:.75rem;color:var(--muted);}
+
+/* ADMIN */
+.a2grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.crgrp{display:flex;gap:8px;flex-wrap:wrap;}
+.crlbl{cursor:pointer;padding:8px 16px;border-radius:8px;
+  border:2px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);
+  font-family:'Oxanium',sans-serif;font-weight:700;transition:all .2s;}
+.crlbl.on{border-color:var(--ok);background:rgba(6,214,160,.12);color:var(--ok);}
+.qitem{padding:10px 13px;background:rgba(255,255,255,.04);border-radius:9px;
+  border:1px solid rgba(255,255,255,.07);
+  display:flex;justify-content:space-between;align-items:center;gap:10px;}
+.qdel{background:rgba(230,57,70,.14);border:1px solid rgba(230,57,70,.3);color:#ff8888;
+  padding:4px 10px;border-radius:7px;cursor:pointer;font-size:.76rem;flex-shrink:0;}
+.qdel:hover{background:rgba(230,57,70,.3);}
+
+/* NOTIF */
+.notif{position:fixed;bottom:26px;left:50%;
+  transform:translateX(-50%) translateY(80px);
+  padding:12px 24px;border-radius:50px;font-weight:700;font-size:.9rem;
+  z-index:300;transition:transform .3s;pointer-events:none;
+  white-space:nowrap;max-width:90vw;text-align:center;}
+.notif.show{transform:translateX(-50%) translateY(0);}
+.notif.suc{background:var(--ok);color:#001a0f;}
+.notif.err{background:var(--ng);color:#fff;}
+.notif.inf{background:var(--blue);color:#fff;}
+.notif.mrk{background:var(--purple);color:#fff;}
+.notif.crs{background:var(--pink);color:#fff;}
+
+.bk{position:fixed;top:16px;right:16px;z-index:50;padding:8px 18px;border-radius:50px;
+  border:1.5px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);
+  backdrop-filter:blur(10px);color:var(--muted);
+  font-family:'Noto Sans Arabic',sans-serif;font-size:.85rem;cursor:pointer;transition:all .2s;}
+.bk:hover{background:rgba(255,255,255,.12);color:#fff;}
+.slbl{font-size:.72rem;letter-spacing:4px;text-transform:uppercase;
+  color:var(--muted);margin-bottom:18px;text-align:center;}
+.divider{border:none;border-top:1px solid rgba(255,255,255,.08);margin:22px 0;}
+.ce{position:fixed;pointer-events:none;font-size:2rem;animation:fall linear forwards;z-index:400;}
+@keyframes fall{from{transform:translateY(-55px) rotate(0);opacity:1}
+                to  {transform:translateY(110vh) rotate(720deg);opacity:0}}
 </style>
 </head>
 <body>
-<div id="toast"></div>
 
-<!-- ════ MAIN MENU ════ -->
-<div class="pg on" id="pgMenu">
-  <div class="card">
-    <div class="ctitle">🕵️ یاری جاسوس</div>
-    <p class="csub">یاری نهێنی — کێ جاسوسە؟</p>
-    <div class="mode-grid">
-      <button class="mode-card" id="btnGoOffline">
-        <span class="mode-icon">📱</span>
-        <span class="mode-label">دەستپێکردنی یاری</span>
-        <span class="mode-sub">یەک مۆبایل — هەموو پلەیەرەکان</span>
-      </button>
+<!-- MAIN MENU -->
+<div id="s-menu" class="screen active">
+  <div class="logo">
+    <h1>QUIZ GAME</h1>
+    <p>کوئیز گەیم</p>
+    <div id="fb-status">⏳ بارکردن...</div>
+  </div>
+  <div class="mwrap">
+    <button class="btn btn-red"    onclick="go('s-players')">👥 &nbsp; ناوی یاریزانەکان</button>
+    <button class="btn btn-blue"   onclick="startGame()">🎮 &nbsp; دەستپێکردنی یاری</button>
+    <button class="btn btn-gold"   onclick="go('s-admin-login')">🔐 &nbsp; ئەدمین</button>
+  </div>
+</div>
+
+<!-- PLAYERS -->
+<div id="s-players" class="screen">
+  <button class="bk" onclick="go('s-menu')">← گەڕانەوە</button>
+  <div class="card" style="max-width:520px">
+    <h2>👥 دامەزراندنی یاریزانەکان</h2>
+    <div class="fg"><label>چەند یاریزان؟</label>
+      <div class="count-grid" id="countGrid"></div>
     </div>
+    <div class="pname-list" id="pnameList"></div>
+    <button class="btn btn-gold" onclick="savePlayers()" style="width:100%">✓ &nbsp; پاراستن</button>
   </div>
 </div>
 
-<!-- ════ OFFLINE SETUP ════ -->
-<div class="pg" id="pgOffline">
+<!-- FIRST TURN -->
+<div id="s-first" class="screen">
+  <div class="card" style="text-align:center">
+    <div style="font-size:3rem;margin-bottom:12px">🎲</div>
+    <p class="slbl">دەستپێکردن</p>
+    <h2 style="font-size:1.5rem;color:#fff;margin-bottom:10px">یاریزانی یەکەم دەست دەکات!</h2>
+    <div id="fName" style="font-size:2.2rem;font-weight:900;color:var(--gold);margin-bottom:20px"></div>
+    <button class="btn btn-blue" onclick="go('s-cats')" style="width:100%">بردن بۆ پۆلەکان ←</button>
+  </div>
+</div>
+
+<!-- CATEGORIES -->
+<div id="s-cats" class="screen" style="justify-content:flex-start;padding-top:16px">
+  <button class="bk" onclick="go('s-menu')">← گەڕانەوە</button>
+  <div class="sbar" id="sbar"></div>
+  <div class="tbanner" id="tbanner"></div>
+  <button class="btn btn-purple" id="mktBtn" onclick="go('s-market')"
+    style="margin-bottom:14px;padding:9px 22px;font-size:.85rem;border-radius:50px">
+    🛒 &nbsp; بازاڕ
+  </button>
+  <p class="slbl">پۆلێک هەڵبژێرە</p>
+  <div class="cgrid" id="cgrid"></div>
+</div>
+
+<!-- LEVEL PICKER -->
+<div id="s-level" class="screen">
+  <button class="bk" onclick="go('s-cats')">← گەڕانەوە</button>
+  <div class="card" style="text-align:center">
+    <p class="slbl">ئاستێک هەڵبژێرە</p>
+    <div id="lpcat" style="font-size:1.15rem;font-weight:800;color:var(--gold);margin-bottom:14px"></div>
+    <div class="lpwrap" id="lpbtns"></div>
+  </div>
+</div>
+
+<!-- QUESTION -->
+<div id="s-q" class="screen">
+  <div class="qhdr">
+    <span class="qbadge qcat"    id="qCat">پۆل</span>
+    <span class="qbadge qplayer" id="qPlayer"></span>
+    <span class="qbadge qpts"    id="qPts">٥٠ خاڵ</span>
+  </div>
+  <div class="tw">
+    <svg class="ts" viewBox="0 0 100 100">
+      <circle class="tbg" cx="50" cy="50" r="40"/>
+      <circle class="tf" id="tFill" cx="50" cy="50" r="40"/>
+    </svg>
+    <div class="tn" id="tNum">40</div>
+  </div>
+  <div class="wbanner" id="wBanner"></div>
+  <div class="qtxt" id="qText"></div>
+  <div class="pubar" id="puBar"></div>
+  <div class="agrid" id="aGrid"></div>
+</div>
+
+<!-- MARKET -->
+<div id="s-market" class="screen">
+  <button class="bk" onclick="go('s-cats')">← گەڕانەوە</button>
+  <div style="text-align:center;margin-bottom:6px">
+    <div style="font-size:2.6rem">🛒</div>
+    <h2 style="color:var(--gold);font-size:1.35rem;margin-top:6px">بازاڕی یارییەکە</h2>
+  </div>
+  <div class="mkt-pts">خاڵی <strong id="mktName">—</strong>: &nbsp;<strong id="mktScore">0</strong> خاڵ</div>
+  <div class="mktgrid" id="mktGrid"></div>
+</div>
+
+<!-- TARGET PICKER -->
+<div id="s-target" class="screen">
+  <button class="bk" onclick="go('s-market')">← گەڕانەوە</button>
+  <div class="card" style="text-align:center;max-width:420px">
+    <div id="tgtIcon" style="font-size:2.5rem;margin-bottom:10px"></div>
+    <h2 id="tgtTitle"></h2>
+    <p id="tgtDesc" style="color:var(--muted);font-size:.83rem;margin-bottom:16px"></p>
+    <div class="tlist" id="tgtList"></div>
+  </div>
+</div>
+
+<!-- FINAL -->
+<div id="s-final" class="screen">
+  <div style="text-align:center;margin-bottom:20px">
+    <div style="font-size:3.5rem">🏆</div>
+    <h2 style="font-size:2rem;font-weight:900;color:var(--gold)">کۆتایی یاری!</h2>
+    <p style="color:var(--muted);margin-top:5px">ئەنجامی کۆتایی</p>
+  </div>
+  <div class="podium" id="podium"></div>
+  <button class="btn btn-gold" onclick="go('s-menu')" style="width:280px;margin-top:14px">🔄 &nbsp; یارییەکی نوێ</button>
+</div>
+
+<!-- ADMIN LOGIN -->
+<div id="s-admin-login" class="screen">
+  <button class="bk" onclick="go('s-menu')">← گەڕانەوە</button>
   <div class="card">
-    <div class="ctitle">📱 ڕێکخستنی یاری</div>
-    <p class="csub">ناوی پلەیەرەکان زیاد بکە</p>
-    <span class="flabel">🕵️ ژمارەی جاسوسەکان</span>
-    <input id="offSpies" type="number" min="1" max="5" value="1">
-    <span class="flabel">⏱️ ماوە (خولەک)</span>
-    <input id="offMins" type="number" min="1" max="20" value="5">
-    <div class="hr"></div>
-    <p style="font-size:14px;color:var(--muted);margin-bottom:6px;font-family:'Noto Naskh Arabic',sans-serif">👤 ناوی پلەیەرەکان زیاد بکە (کەمترین ٢)</p>
-    <div id="offNameList"></div>
-    <button class="btn bd" style="margin-top:12px" id="btnAddName">➕ زیادکردنی پلەیەر</button>
-    <button class="btn bp" id="offStartBtn" style="margin-top:8px" disabled>🚀 دەستپێکردن</button>
-    <div id="offErr" class="err"></div>
-    <button class="btn bd" id="btnBackMenu" style="margin-top:8px">← گەڕانەوە</button>
-  </div>
-</div>
-
-<!-- ════ OFFLINE ROLE REVEAL OVERLAY ════ -->
-<div class="off-overlay" id="offOverlay">
-  <div class="off-inner">
-    <div style="font-size:12px;color:var(--muted);margin-bottom:6px;font-family:'Noto Naskh Arabic',sans-serif" id="offStepLbl">گامی ١ لە ٦</div>
-    <div class="big-pname" id="offPName">پلەیەری ١</div>
-    <p class="csub" style="margin-bottom:18px">مۆبایلەکەت بگرە — تەنها تۆ ببینە!</p>
-    <button class="btn bp" id="offRevBtn">👁️ پیشاندانی ڕۆڵ</button>
-    <div id="offRoleCard" style="display:none;margin-top:14px"></div>
-    <button class="btn bg" id="offNextBtn" style="display:none;margin-top:12px">➡️ داهاتوو</button>
-  </div>
-</div>
-
-<!-- ════ OFFLINE GAME ════ -->
-<div class="pg" id="pgOffGame">
-  <div class="card">
-    <div id="offtimer">⏱️ 00:00</div>
-    <div class="hintbox" id="offHint"></div>
-    <div class="rcard" id="offGameRole"></div>
-    <div class="hr"></div>
-    <div style="text-align:center;font-weight:700;margin-bottom:8px;font-size:15px;font-family:'Noto Naskh Arabic',sans-serif;font-feature-settings:'liga' 1">🗳️ دەنگ بدە — جاسوس کێیە؟</div>
-    <p class="status" id="offVMsg"></p>
-    <div class="vgrid" id="offVGrid"></div>
-    <div id="offRes" style="display:none"></div>
-    <div id="offEnd" style="display:none">
-      <button class="btn bg" id="btnRestart">🔄 یاری نوێ</button>
-      <button class="btn bd" id="btnEndMenu" style="margin-top:8px">🏠 گەڕانەوە</button>
+    <div style="text-align:center;font-size:2.8rem;margin-bottom:12px">🔐</div>
+    <h2>وشەی نهێنی بنووسە</h2>
+    <div class="fg">
+      <input type="password" id="aPw" placeholder="••••••" maxlength="10"
+        style="text-align:center;letter-spacing:8px;font-size:1.3rem;font-family:'Oxanium',sans-serif"
+        onkeydown="if(event.key==='Enter')checkPw()"/>
     </div>
+    <button class="btn btn-red" onclick="checkPw()" style="width:100%">داخلبوون</button>
   </div>
 </div>
+
+<!-- ADMIN PANEL -->
+<div id="s-admin" class="screen" style="justify-content:flex-start;padding-top:16px;overflow-y:auto">
+  <button class="bk" onclick="go('s-menu')">← گەڕانەوە</button>
+  <div class="card" style="max-width:640px;width:100%;margin-top:54px;margin-bottom:36px">
+    <div style="text-align:center;font-size:1.8rem;margin-bottom:4px">⚙️</div>
+    <h2>زیادکردنی پرسیار</h2>
+    <div id="adminSrc" style="text-align:center;font-size:.76rem;color:var(--muted);margin-bottom:12px"></div>
+    <div class="fg"><label>پۆل</label>
+      <select id="aCat">
+        <option value="">-- پۆلێک هەڵبژێرە --</option>
+        <option value="health">❤️ تەندرووستی</option>
+        <option value="sports">⚽ وەرزشی</option>
+        <option value="cinema">🎬 سینەما</option>
+        <option value="physics">⚡ فیزیا</option>
+        <option value="general">🌐 گشتی</option>
+        <option value="geography">🗺️ جوگرافیا</option>
+        <option value="logic">🧠 هزری</option>
+        <option value="tech">💻 تەکنەڵۆژیا</option>
+        <option value="chemistry">🧪 کیمیا</option>
+        <option value="universe">🌌 گەردوونی</option>
+        <option value="gaming">🎮 گەیمینگ</option>
+      </select>
+    </div>
+    <div class="fg"><label>ئاست — A / B / C / D</label>
+      <input type="text" id="aLvl" maxlength="1" placeholder="A  /  B  /  C  /  D"
+        style="text-transform:uppercase;letter-spacing:8px;font-family:'Oxanium',sans-serif;font-size:1.2rem;text-align:center"/>
+    </div>
+    <div class="fg"><label>دەقی پرسیار</label>
+      <textarea id="aQ" placeholder="پرسیار بنووسە..."></textarea>
+    </div>
+    <div class="fg"><label>وەڵامەکان (A و B پێویستن)</label>
+      <div class="a2grid">
+        <input type="text" id="a0" placeholder="A — وەڵامی یەکەم"/>
+        <input type="text" id="a1" placeholder="B — وەڵامی دووەم"/>
+        <input type="text" id="a2" placeholder="C — ئارەزوومەندانە"/>
+        <input type="text" id="a3" placeholder="D — ئارەزوومەندانە"/>
+      </div>
+    </div>
+    <div class="fg"><label>وەڵامی ڕاست</label>
+      <div class="crgrp">
+        <label class="crlbl" id="cr0" onclick="pickCr(0)">A</label>
+        <label class="crlbl" id="cr1" onclick="pickCr(1)">B</label>
+        <label class="crlbl" id="cr2" onclick="pickCr(2)">C</label>
+        <label class="crlbl" id="cr3" onclick="pickCr(3)">D</label>
+      </div>
+    </div>
+    <button class="btn btn-gold" id="saveBtn" onclick="adminSave()" style="width:100%;margin-top:6px">
+      💾 &nbsp; پاراستن
+    </button>
+    <hr class="divider">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <span style="font-size:1rem;color:var(--muted);font-weight:700">پرسیارە پاراستراوەکان</span>
+      <button onclick="adminReload()"
+        style="padding:4px 10px;border-radius:7px;border:1px solid rgba(255,255,255,.13);
+               background:rgba(255,255,255,.06);color:var(--muted);cursor:pointer;font-size:.75rem">
+        🔄 نوێکردنەوە</button>
+    </div>
+    <div id="adminList" style="display:flex;flex-direction:column;gap:7px"></div>
+  </div>
+</div>
+
+<!-- Result overlay -->
+<div class="ro" id="ro">
+  <div class="rb" id="rb">
+    <div class="ri" id="ri"></div>
+    <div class="rt" id="rt"></div>
+    <div class="rp" id="rp"></div>
+    <div class="re" id="re" style="display:none"></div>
+  </div>
+</div>
+<div class="notif" id="notif"></div>
 
 <script>
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-//  WORDS
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-const WORDS = [
-  {cat:"شار/ووڵات",      hint:"شوێنێکی ناسراو",        items:["سلێمانی","هەولێر","دهۆک","کرکوک","بەغدا","کەنەدا","ئەمەریکا","نیۆڕک","لەندەن","پاریس","ئیتالیا","ئالمانیا","تورکیا","ئێران","ژاپۆن","دوبەی"]},
-  {cat:"خواردن",          hint:"خواردنێکی ناسراو",      items:["کەباب","پیتزا","بەریانی","دۆنەر","ماسی","برنج","یاپراخ","شفتە","کفتە","مریشک","گۆشت","سووپ","هەمبەرگەر","پاستا","ساندویچ","لازانیا","سوشی","شاورما"]},
-  {cat:"سۆشیال میدیا",   hint:"پلاتفۆرمی ئینتەرنێت",  items:["یوتوب","تیکتۆک","فەیسبووک","ئینستاگرام","ئێکس","تویچ","سناپ","دیسکۆرد","واتساپ","تێلێگرام","پینتەرست"]},
-  {cat:"ئاژەڵ",           hint:"زیندووەکان",             items:["سەگ","پشیلە","مار","گوورگ","شێر","بزن","کەر","مەیموون","ووشتر","کۆتر","قاز","نەهەنگ","زەرافە","ئەسپ","پلەنگ"]},
-  {cat:"شت/بێگیان",      hint:"شتێکی ڕۆژانە",          items:["کورسی","فڕن","قەنەفە","زۆپا","سەیارە","تەیارە","مۆبایل","تەلەفزیۆن","بەلەم","بەرد","جل","کاتژمێر","لاپتۆپ","فریدجەر","ماکرۆوێف"]},
-  {cat:"وەرزش",           hint:"چالاکییەکی جەستەیی",    items:["فوتبۆل","بەسکێتبۆل","تێنیس","شناکردن","والێبۆل","بۆکس","گۆڵف","تەکواندۆ"]},
-  {cat:"فیلم",            hint:"فیلمێکی ناسراو",        items:["تایتانیک","ئەڤاتار","ئینسێپشن","ئینتەرستێلار","مەتریکس","گودفادەر","هاری پۆتەر","باتمان","سوپەرمان","جۆکەر","ئەڤنجەرز"]},
-  {cat:"پیشە",            hint:"کارێکی مرۆڤ",           items:["دکتۆر","مامۆستا","ئەندازیار","پۆلیس","پەرستار","شۆفێر","وەرزشکار","نووسەر","دیزاینەر","دەلاڵ"]},
-  {cat:"تیمی فوتبۆل ⚽",  hint:"تیمێکی ناسراوی فوتبۆل", items:["مانچستەر سیتی","ڕیال مادرید","بارسەلۆنا","ئاک میلان","بایەرن موونیخ","لیڤەرپوول","مانچستەر یونایتد","چێلسی","ئارسنال","توتنهام","یووێنتووس","ئینتەر میلان","پاری سەن-ژەرمێن","بۆرووسیا دۆرتموند","ئاتلێتیکۆ مادرید","نەپۆلی","ئەیاکس","بنفیکا","پۆرتۆ","سەڤیا","ڤالێنسیا","ڤیاڕیال","لاتسیو","ڕۆما","فیۆرێنتینا","لێستەر سیتی","ئێڤەرتۆن","نیووکاسڵ","ئاستۆن ڤیلا","وێست هام"]},
-  {cat:"یاریزانی فوتبۆل 🌟", hint:"یاریزانێکی ناسراوی فوتبۆل", items:["هالاند","مێسی","ڕۆنالدۆ","ئەمبابێ","نەیمار","مۆدریچ","ڤینیسیووس جوونیۆر","بێلینگهام","سالا","دی بروینە","لێواندۆوسکی","بێنزەما","ئیبراهیمۆڤیچ","نێیمار","سوناێ","تریپییەر","ڕاشفۆرد","سانچۆ","گریلیش","فۆدن","تیاگۆ ئالکانتارا","پێدری","گاڤی","بارسیا","یامال","ئۆسیمهێن","دیۆگۆ جۆتا","دارویین نوونیەز","کیلیان مبابێ","زیدان"]}
+// ═══════════════════════════════════════════════════════
+//  FIREBASE REST API — NO SDK NEEDED
+//  Database: quizgame2-cd4d5-default-rtdb.firebaseio.com
+// ═══════════════════════════════════════════════════════
+const FB = "https://quizgame2-cd4d5-default-rtdb.firebaseio.com";
+
+async function fbGet(path) {
+  const r = await fetch(FB + path + ".json");
+  if (!r.ok) throw new Error("HTTP " + r.status);
+  return r.json();
+}
+
+async function fbPut(path, data) {
+  const r = await fetch(FB + path + ".json", {
+    method:  "PUT",
+    headers: { "Content-Type": "application/json" },
+    body:    JSON.stringify(data)
+  });
+  if (!r.ok) throw new Error("HTTP " + r.status);
+  return r.json();
+}
+
+// ── Load all questions ──
+async function fbLoadAll() {
+  const raw = await fbGet("/questions");
+  if (!raw) return {};
+  const out = {};
+  for (const cat in raw) {
+    out[cat] = {};
+    for (const lvl in raw[cat]) {
+      const v = raw[cat][lvl];
+      out[cat][lvl] = Array.isArray(v) ? v.filter(Boolean) : Object.values(v).filter(Boolean);
+    }
+  }
+  return out;
+}
+
+// ── Save one question ──
+async function fbSaveQ(catId, lvl, arr) {
+  return fbPut("/questions/" + catId + "/" + lvl, arr);
+}
+
+// ══════════════════════════════════════
+//  localStorage BACKUP
+// ══════════════════════════════════════
+const LS = "quizgame_v7";
+function lsLoad() { try { return JSON.parse(localStorage.getItem(LS) || "{}"); } catch(e) { return {}; } }
+function lsSave() { localStorage.setItem(LS, JSON.stringify(allQ)); }
+
+// ══════════════════════════════════════
+//  STATUS
+// ══════════════════════════════════════
+function setStatus(msg, color) {
+  const el = document.getElementById("fb-status");
+  if (el) { el.textContent = msg; el.style.color = color; }
+}
+
+// ══════════════════════════════════════
+//  BOOT — load questions
+// ══════════════════════════════════════
+let fbOK = false;
+let allQ = {};
+
+function bootLoad() {
+  setStatus("⏳ بارکردن...", "#f0b429");
+  fbLoadAll()
+    .then(data => {
+      allQ  = data;
+      fbOK  = true;
+      lsSave();
+      setStatus("🟢 Firebase یەکگیراوە", "#06d6a0");
+    })
+    .catch(err => {
+      allQ  = lsLoad();
+      fbOK  = false;
+      setStatus("⚠️ بەبێ ئینتەرنەت — localStorage", "#f97316");
+      console.warn("Firebase failed:", err.message);
+    });
+}
+
+// ══════════════════════════════════════
+//  CONSTANTS
+// ══════════════════════════════════════
+const ADMIN_PW = "112233";
+const Q_TIME   = 40;
+const WAIT_S   = 10;
+
+const COLORS = ["#ff6b7a","#5b9cf6","#4ade80","#fbbf24","#fb923c","#a78bfa","#22d3ee","#f472b6","#a3e635","#f87171"];
+const EMOJIS = ["🔴","🔵","🟢","🟡","🟠","🟣","🩵","🩷","🟩","❤️"];
+
+const CATS = [
+  {id:"health",    name:"تەندرووستی", icon:"❤️"},
+  {id:"sports",    name:"وەرزشی",     icon:"⚽"},
+  {id:"cinema",    name:"سینەما",     icon:"🎬"},
+  {id:"physics",   name:"فیزیا",      icon:"⚡"},
+  {id:"general",   name:"گشتی",       icon:"🌐"},
+  {id:"geography", name:"جوگرافیا",   icon:"🗺️"},
+  {id:"logic",     name:"هزری",       icon:"🧠"},
+  {id:"tech",      name:"تەکنەڵۆژیا", icon:"💻"},
+  {id:"chemistry", name:"کیمیا",      icon:"🧪"},
+  {id:"universe",  name:"گەردوونی",   icon:"🌌"},
+  {id:"gaming",    name:"گەیمینگ",    icon:"🎮"},
 ];
 
-function pickSecret(){
-  const g = WORDS[Math.floor(Math.random()*WORDS.length)];
-  return {word:g.items[Math.floor(Math.random()*g.items.length)], cat:g.cat, hint:g.hint};
-}
+const SHOP = [
+  { id:"lifeline", icon:"🔀", name:"٥٠/٥٠",       price:45, color:"#a78bfa", cls:"mc-life",
+    desc:"٢ وەڵامی غەلەت دەبرێت",              target:false },
+  { id:"double",   icon:"✖️",  name:"دوو حەز خاڵ", price:45, color:"#fb923c", cls:"mc-dbl",
+    desc:"پرسیاری داهاتوو ١٠٠ خاڵ",            target:false },
+  { id:"time",     icon:"⏱️", name:"+٢٠ چرکە",     price:30, color:"#22d3ee", cls:"mc-time",
+    desc:"٢٠ چرکەی زیادە بۆ پرسیاری داهاتوو",  target:false },
+  { id:"steal",    icon:"💰", name:"دزینی خاڵ",    price:60, color:"#f87171", cls:"mc-steal",
+    desc:"ئەگەر ئەو غەلەت کرد: ٣٠ خاڵ لێی دەگرێت. ئەگەر ڕاست کرد: هیچ نابێت",
+    target:true, tIcon:"💰", tTitle:"لە کێ خاڵ بدزێیت؟", tDesc:"١٥ چرکەی هەیە بۆ وەڵام" },
+  { id:"curse",    icon:"⚡", name:"نەفرەت",        price:30, color:"#f472b6", cls:"mc-curse",
+    desc:"ئەو یاریزانە تەنها ١٥ چرکە هەیە. ئەگەر غەلەت کرد: هیچ خاڵ کەم ناکات",
+    target:true, tIcon:"⚡", tTitle:"کێ نەفرەت بکەیت؟", tDesc:"پرسیاری داهاتووی تەنها ١٥ چرکە" },
+];
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-//  STATE
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-let offPlayers=[], offSecret={}, offCurIdx=0, offTimerID=null, offRevealed=false;
-let offNameCount=0;
+// ══════════════════════════════════════
+//  GAME STATE
+// ══════════════════════════════════════
+let numP     = 3;
+let players  = [];
+let scores   = [];
+let powerups = []; // [{lifeline,double,time}]
+let effects  = []; // [{stealBy:null|idx, curseBy:null|idx}]
+let turnIdx  = 0;
+let usedLvl  = {};
+let curCat   = null, curLvl = null, curQ = null;
+let qUsage   = {};
+let answered = false;
+let timerI   = null, waitI = null;
+let tLeft    = 40;
+let selCr    = -1;
+let pending  = null; // {type, buyerIdx}
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-//  HELPERS
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function goPage(id){
-  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
-  document.getElementById(id).classList.add('on');
-}
-
-function toast(msg){
-  const e=document.getElementById('toast');
-  e.innerText=msg; e.classList.add('show');
-  setTimeout(()=>e.classList.remove('show'),2500);
-}
-function setErr(id,m){const e=document.getElementById(id);if(e)e.innerText=m;}
-function stopOffTimer(){clearInterval(offTimerID);offTimerID=null;}
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-//  WIRE UP STATIC BUTTONS (safe — no Kurdish in onclick attrs)
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-document.getElementById('btnGoOffline').addEventListener('click', goOffline);
-document.getElementById('btnAddName').addEventListener('click', addOffName);
-document.getElementById('offStartBtn').addEventListener('click', startOffGame);
-document.getElementById('btnBackMenu').addEventListener('click', ()=>goPage('pgMenu'));
-document.getElementById('offRevBtn').addEventListener('click', showOffRole);
-document.getElementById('offNextBtn').addEventListener('click', nextOffPlayer);
-document.getElementById('btnRestart').addEventListener('click', restartOff);
-document.getElementById('btnEndMenu').addEventListener('click', ()=>goPage('pgMenu'));
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-//  OFFLINE SETUP
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function goOffline(){
-  offNameCount=0;
-  document.getElementById('offNameList').innerHTML='';
-  setErr('offErr','');
-  addOffName(); addOffName();
-  goPage('pgOffline');
-}
-
-function updateStartBtn(){
-  document.getElementById('offStartBtn').disabled = offNameCount < 2;
-}
-
-function addOffName(){
-  if(offNameCount>=20){toast('زیاتر لە ٢٠ پلەیەر ناکرێت');return;}
-  const idx = offNameCount++;
-  const div = document.createElement('div');
-  div.id = `offNameDiv_${idx}`;
-
-  const lbl = document.createElement('span');
-  lbl.className = 'flabel';
-  lbl.textContent = `👤 پلەیەری ${idx+1}`;
-
-  const row = document.createElement('div');
-  row.className = 'name-row';
-
-  const inp = document.createElement('input');
-  inp.type = 'text';
-  inp.id = `offN_${idx}`;
-  inp.maxLength = 14;
-  inp.placeholder = `ناوی پلەیەری ${idx+1}`;
-
-  const delBtn = document.createElement('button');
-  delBtn.className = 'del-btn';
-  delBtn.textContent = '✕';
-  // ✅ FIX: addEventListener instead of onclick attr — no Kurdish text in attribute
-  delBtn.addEventListener('click', () => removeOffName(idx));
-
-  row.appendChild(inp);
-  row.appendChild(delBtn);
-  div.appendChild(lbl);
-  div.appendChild(row);
-  document.getElementById('offNameList').appendChild(div);
-  updateStartBtn();
-}
-
-function removeOffName(idx){
-  const div = document.getElementById(`offNameDiv_${idx}`);
-  if(div) div.remove();
-  const remaining = document.querySelectorAll('#offNameList input[type="text"]').length;
-  offNameCount = remaining;
-  document.querySelectorAll('#offNameList > div').forEach((d,i)=>{
-    const lbl = d.querySelector('.flabel');
-    const inp = d.querySelector('input');
-    if(lbl) lbl.textContent = `👤 پلەیەری ${i+1}`;
-    if(inp) inp.placeholder = `ناوی پلەیەری ${i+1}`;
-  });
-  updateStartBtn();
-}
-
-function startOffGame(){
-  const spyCnt = parseInt(document.getElementById('offSpies').value)||1;
-  const mins   = parseInt(document.getElementById('offMins').value)||5;
-
-  const names = [];
-  let hasBlank = false;
-  document.querySelectorAll('#offNameList input[type="text"]').forEach(inp=>{
-    const v = inp.value.trim();
-    if(v) names.push(v);
-    else hasBlank = true;
-  });
-
-  if(names.length < 2){setErr('offErr','⚠️ کەمترین ٢ پلەیەر');return;}
-  if(hasBlank){setErr('offErr','⚠️ هەموو ناوەکان پڕ بکەرەوە');return;}
-  if(spyCnt >= names.length){setErr('offErr','⚠️ ژمارەی جاسوس زیادتره');return;}
-  setErr('offErr','');
-
-  offSecret = pickSecret();
-  offSecret._mins = mins;
-
-  const shuffled = [...names.keys()].sort(()=>Math.random()-0.5);
-  const spyIdx   = shuffled.slice(0, spyCnt);
-
-  offPlayers = names.map((name,i)=>({name, isSpy: spyIdx.includes(i)}));
-  offCurIdx  = 0;
-  showOffCover();
-}
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-//  OFFLINE REVEAL
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function showOffCover(){
-  if(offCurIdx >= offPlayers.length){
-    document.getElementById('offOverlay').classList.remove('on');
-    launchOffGame();
-    return;
+// ══════════════════════════════════════
+//  PLAYER COUNT UI
+// ══════════════════════════════════════
+function initCountGrid() {
+  const g = document.getElementById("countGrid"); g.innerHTML = "";
+  for (let i = 1; i <= 10; i++) {
+    const b = document.createElement("button");
+    b.className = "cnt-btn" + (i === numP ? " sel" : "");
+    b.textContent = i;
+    b.onclick = () => { numP = i; initCountGrid(); buildNames(); };
+    g.appendChild(b);
   }
-  const p = offPlayers[offCurIdx];
-  document.getElementById('offOverlay').classList.add('on');
-  document.getElementById('offStepLbl').textContent = `گامی ${offCurIdx+1} لە ${offPlayers.length}`;
-  document.getElementById('offPName').textContent   = `👤 ${p.name}`;
-  document.getElementById('offRevBtn').style.display  = 'block';
-  document.getElementById('offRevBtn').disabled       = false;
-  document.getElementById('offRoleCard').style.display = 'none';
-  document.getElementById('offRoleCard').innerHTML     = '';
-  document.getElementById('offNextBtn').style.display  = 'none';
-  offRevealed = false;
 }
 
-function showOffRole(){
-  if(offRevealed) return;
-  offRevealed = true;
-  const p  = offPlayers[offCurIdx];
-  document.getElementById('offRevBtn').style.display = 'none';
-  const el = document.getElementById('offRoleCard');
-  el.style.display = 'block';
-
-  if(p.isSpy){
-    el.innerHTML = `<div class="rcard rspy">
-      <span class="em">🕵️</span>
-      تۆ <strong>جاسوسیت!</strong>
-      <span class="wd">جۆر: ${offSecret.cat}</span>
-      <small>وشەی نهێنی نازانیت — زیرەکانە!</small>
-    </div>`;
-  } else {
-    el.innerHTML = `<div class="rcard rnorm">
-      <span class="em">✅</span>
-      تۆ <strong>شارەزایی!</strong>
-      <span class="wd">📌 ${offSecret.word}</span>
-      <small>ئەم وشەیە بپارێزە!</small>
-    </div>`;
+function buildNames() {
+  const list = document.getElementById("pnameList"); list.innerHTML = "";
+  for (let i = 0; i < numP; i++) {
+    const row = document.createElement("div"); row.className = "pname-row";
+    const dot = document.createElement("div"); dot.className = "p-dot";
+    dot.style.background = COLORS[i];
+    const inp = document.createElement("input");
+    inp.type = "text"; inp.id = "pn" + i;
+    inp.placeholder = EMOJIS[i] + " یاریزانی " + (i + 1);
+    inp.value = players[i] ? players[i].name : "";
+    row.appendChild(dot); row.appendChild(inp);
+    list.appendChild(row);
   }
-  document.getElementById('offNextBtn').style.display = 'block';
 }
 
-function nextOffPlayer(){
-  offCurIdx++;
-  showOffCover();
+function savePlayers() {
+  const arr = [];
+  for (let i = 0; i < numP; i++) {
+    const n = document.getElementById("pn" + i).value.trim();
+    if (!n) { notif("تکایە هەموو ناوەکان بنووسە", "err"); return; }
+    arr.push({ name: n, color: COLORS[i], emoji: EMOJIS[i] });
+  }
+  players = arr;
+  notif("ناوەکان پارازران ✓", "suc");
+  setTimeout(() => go("s-menu"), 700);
 }
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-//  OFFLINE GAME
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function launchOffGame(){
-  goPage('pgOffGame');
-  document.getElementById('offHint').style.display = 'none';
-  document.getElementById('offRes').style.display  = 'none';
-  document.getElementById('offEnd').style.display  = 'none';
-  document.getElementById('offVMsg').textContent   = '';
-  document.getElementById('offtimer').classList.remove('red');
+// ══════════════════════════════════════
+//  NAVIGATION
+// ══════════════════════════════════════
+function go(id) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  if (id === "s-players") { initCountGrid(); buildNames(); }
+  if (id === "s-cats")    { updateSBar(); renderCats(); }
+  if (id === "s-market")  { renderMarket(); }
+}
 
-  const roleEl = document.getElementById('offGameRole');
-  roleEl.className   = 'rcard';
-  roleEl.style.cssText = 'background:rgba(255,255,255,.04);border:1px solid var(--border)';
-  roleEl.innerHTML   = `🗣️ <strong>کاتی گفتوگۆ!</strong><br>
-    <small style="color:var(--muted)">جۆر: <strong style="color:var(--gold)">${offSecret.cat}</strong></small>`;
+// ══════════════════════════════════════
+//  START GAME
+// ══════════════════════════════════════
+function startGame() {
+  if (!players.length) { notif("تکایە سەرەتا ناوی یاریزانەکان بنووسە", "err"); return; }
+  const withQ = CATS.filter(c => getLevels(c.id).length > 0);
+  if (!withQ.length)   { notif("تکایە سەرەتا پرسیار زیاد بکە لە ئەدمین", "err"); return; }
+  scores   = players.map(() => 0);
+  powerups = players.map(() => ({ lifeline:false, double:false, time:false }));
+  effects  = players.map(() => ({ stealBy:null, curseBy:null }));
+  usedLvl  = {}; qUsage = {};
+  turnIdx  = Math.floor(Math.random() * players.length);
+  document.getElementById("fName").textContent = players[turnIdx].name;
+  document.getElementById("fName").style.color = players[turnIdx].color;
+  updateSBar(); go("s-first");
+}
 
-  const mins = offSecret._mins || 5;
-  let t = mins * 60, half = Math.floor(t/2), hintShown = false;
-  updateOffClock(t);
-  stopOffTimer();
-  offTimerID = setInterval(()=>{
-    t--; updateOffClock(t);
-    if(t <= 10) document.getElementById('offtimer').classList.add('red');
-    if(!hintShown && t <= half){
-      hintShown = true;
-      const hb = document.getElementById('offHint');
-      hb.style.display = 'block';
-      hb.textContent   = `💡 هینتی دووەم: ${offSecret.hint}`;
-    }
-    if(t <= 0) stopOffTimer();
-  }, 1000);
+// ══════════════════════════════════════
+//  SCORE BAR
+// ══════════════════════════════════════
+function updateSBar() {
+  const bar = document.getElementById("sbar"); bar.innerHTML = "";
+  players.forEach((p, i) => {
+    const d = document.createElement("div");
+    d.className = "sc" + (i === turnIdx ? " cur" : "");
+    if (i === turnIdx) d.style.borderColor = p.color;
+    const hasSteal = effects[i].stealBy !== null;
+    const hasCurse = effects[i].curseBy !== null;
+    d.innerHTML = `<div class="se">${p.emoji}</div>
+      <div class="sn">${p.name}</div>
+      <div class="sp">${scores[i]}</div>
+      <div class="sb">${hasCurse?"⚡":""}${hasSteal?"💰":""}</div>`;
+    bar.appendChild(d);
+  });
+  const tb = document.getElementById("tbanner");
+  const p  = players[turnIdx];
+  tb.textContent      = "دەوری " + p.emoji + " " + p.name;
+  tb.style.color      = p.color;
+  tb.style.borderColor = p.color;
+  const mb = document.getElementById("mktBtn");
+  if (mb) mb.innerHTML = "🛒 &nbsp; بازاڕ (" + scores[turnIdx] + " خاڵ)";
+}
 
-  // ✅ FIX: Build vote buttons with addEventListener — Kurdish names are NOT put in onclick attrs
-  const grid = document.getElementById('offVGrid');
-  grid.innerHTML = '';
-  offPlayers.forEach((p, i)=>{
-    const b = document.createElement('button');
-    b.className   = 'vbtn';
-    b.textContent = `🧑 ${p.name}`;
-    // ✅ Capture i and p.name safely in closure — no attribute injection
-    b.addEventListener('click', () => offVote(i, p.name));
+// ══════════════════════════════════════
+//  CATEGORIES
+// ══════════════════════════════════════
+function getLevels(catId) {
+  if (!allQ[catId]) return [];
+  return Object.keys(allQ[catId]).filter(l => {
+    const v = allQ[catId][l];
+    return (Array.isArray(v) ? v : Object.values(v||{})).filter(Boolean).length > 0;
+  }).sort();
+}
+
+function toArr(v) {
+  if (!v) return [];
+  return Array.isArray(v) ? v.filter(Boolean) : Object.values(v).filter(Boolean);
+}
+
+function renderCats() {
+  const grid = document.getElementById("cgrid"); grid.innerHTML = "";
+  CATS.forEach(cat => {
+    const avail   = getLevels(cat.id);
+    const usedSet = usedLvl[cat.id] || new Set();
+    const remain  = avail.filter(l => !usedSet.has(l));
+    const btn = document.createElement("button");
+    btn.className = "cbtn" + (remain.length === 0 ? " dis" : "");
+    let lh = avail.map(l => `<span class="lb ${usedSet.has(l)?"used":"avail"}">${l}</span>`).join("");
+    if (!avail.length) lh = `<span style="font-size:.68rem;color:rgba(255,255,255,.25)">پرسیار نییە</span>`;
+    btn.innerHTML = `<span class="ci">${cat.icon}</span><span>${cat.name}</span><div class="cl">${lh}</div>`;
+    if (remain.length > 0) btn.onclick = () => openLP(cat.id);
+    grid.appendChild(btn);
+  });
+  const withQ = CATS.filter(c => getLevels(c.id).length > 0);
+  if (withQ.length > 0 && withQ.every(cat => {
+    const used = usedLvl[cat.id] || new Set();
+    return getLevels(cat.id).every(l => used.has(l));
+  })) setTimeout(showFinal, 500);
+}
+
+// ══════════════════════════════════════
+//  LEVEL PICKER
+// ══════════════════════════════════════
+function openLP(catId) {
+  curCat = catId;
+  const cat     = CATS.find(c => c.id === catId);
+  const avail   = getLevels(catId);
+  const usedSet = usedLvl[catId] || new Set();
+  document.getElementById("lpcat").textContent = cat.icon + " " + cat.name;
+  const wrap = document.getElementById("lpbtns"); wrap.innerHTML = "";
+  avail.forEach(l => {
+    const b = document.createElement("button");
+    b.className = "lpbtn"; b.textContent = l; b.disabled = usedSet.has(l);
+    if (!usedSet.has(l)) b.onclick = () => { curLvl = l; loadQ(); };
+    wrap.appendChild(b);
+  });
+  go("s-level");
+}
+
+// ══════════════════════════════════════
+//  QUESTION
+// ══════════════════════════════════════
+function loadQ() {
+  const pool = toArr(allQ[curCat] && allQ[curCat][curLvl]);
+  if (!pool.length) { notif("ئەم ئاستە پرسیاری نییە!", "err"); markUsed(curCat,curLvl); back2cats(); return; }
+  const key   = curCat + "_" + curLvl;
+  const idx   = (qUsage[key] || 0) % pool.length;
+  qUsage[key] = idx + 1;
+  curQ = pool[idx]; answered = false;
+  clearTs(); renderQ(); go("s-q"); startTimer();
+}
+
+function renderQ() {
+  const cat = CATS.find(c => c.id === curCat);
+  const p   = players[turnIdx];
+  const eff = effects[turnIdx];
+  const pts = powerups[turnIdx].double ? 100 : 50;
+  document.getElementById("qCat").textContent     = (cat ? cat.name : "") + " — " + curLvl;
+  document.getElementById("qPlayer").textContent  = p.emoji + " " + p.name;
+  document.getElementById("qPlayer").style.color  = p.color;
+  document.getElementById("qPts").textContent     = pts + " خاڵ" + (powerups[turnIdx].double ? " ✖️" : "");
+  document.getElementById("qText").textContent    = curQ.question;
+  // hide wait banner
+  const wb = document.getElementById("wBanner");
+  wb.style.display = "none"; wb.className = "wbanner";
+  // curse ring
+  const tw = document.querySelector(".tw");
+  const ring = tw.querySelector(".curse-ring");
+  if (eff.curseBy !== null || eff.stealBy !== null) {
+    if (!ring) { const r = document.createElement("div"); r.className = "curse-ring"; tw.appendChild(r); }
+  } else { if (ring) ring.remove(); }
+  // answers
+  const grid = document.getElementById("aGrid"); grid.innerHTML = "";
+  const L = ["A","B","C","D"];
+  curQ.answers.forEach((ans, i) => {
+    if (!ans || !String(ans).trim()) return;
+    const b = document.createElement("button");
+    b.className = "ab"; b.dataset.idx = i;
+    b.innerHTML = `<span class="al">${L[i]}</span>${ans}`;
+    b.onclick   = () => pickAnswer(i, b);
     grid.appendChild(b);
   });
+  // powerup bar
+  renderPuBar();
 }
 
-function updateOffClock(t){
-  const m = String(Math.floor(t/60)).padStart(2,'0');
-  const s = String(t%60).padStart(2,'0');
-  document.getElementById('offtimer').textContent = `⏱️ ${m}:${s}`;
-}
-
-function offVote(idx, name){
-  stopOffTimer();
-  document.querySelectorAll('#offVGrid .vbtn').forEach(b=>b.disabled=true);
-  document.getElementById('offVMsg').textContent = '';
-
-  const caught    = offPlayers[idx].isSpy;
-  const spyNames  = offPlayers.filter(p=>p.isSpy).map(p=>p.name).join('، ');
-
-  const el = document.getElementById('offRes');
-  el.style.display = 'block';
-
-  if(caught){
-    el.className = 'resbox rwin';
-    el.innerHTML = `🎉 <strong>سەرکەوتن!</strong><br>جاسوس <strong>${name}</strong> دەستگیر کرا!<br>
-      <small style="opacity:.7">جاسوسەکان: ${spyNames}</small><br>
-      <small style="opacity:.7">وشەی نهێنی: <strong style="color:var(--gold)">${offSecret.word}</strong></small>`;
-  } else {
-    el.className = 'resbox rlose';
-    el.innerHTML = `😈 <strong>جاسوسەکە بردی!</strong><br>دەنگ دەدرا بۆ <strong>${name}</strong><br>
-      <small style="opacity:.7">جاسوسەکان: ${spyNames}</small><br>
-      <small style="opacity:.7">وشەی نهێنی: <strong style="color:var(--gold)">${offSecret.word}</strong></small>`;
+function renderPuBar() {
+  const bar = document.getElementById("puBar"); bar.innerHTML = "";
+  if (powerups[turnIdx].lifeline) {
+    const b = document.createElement("button");
+    b.className = "pu-btn pu-lifeline";
+    b.innerHTML = "🔀 ٥٠/٥٠ بەکاربێنە";
+    b.onclick   = useLifeline;
+    bar.appendChild(b);
   }
-  document.getElementById('offEnd').style.display = 'block';
 }
 
-function restartOff(){
-  stopOffTimer();
-  goPage('pgOffline');
+// ══════════════════════════════════════
+//  TIMER
+// ══════════════════════════════════════
+function clearTs() { clearInterval(timerI); clearInterval(waitI); }
+
+function startTimer() {
+  const eff      = effects[turnIdx];
+  const isCursed = eff.curseBy !== null;
+  const isStolen = eff.stealBy !== null;
+  const hasTime  = powerups[turnIdx].time;
+  let total = (isCursed || isStolen) ? 15 : 40;
+  if (hasTime) total += 20;
+  powerups[turnIdx].time = false;
+  tLeft = total; updT(total);
+  timerI = setInterval(() => {
+    tLeft--; updT(total);
+    if (tLeft <= 0) { clearInterval(timerI); if (!answered) timeUp(); }
+  }, 1000);
 }
+
+function updT(total) {
+  document.getElementById("tFill").style.strokeDashoffset = 251.2 * (1 - tLeft / total);
+  document.getElementById("tNum").textContent = tLeft;
+  document.getElementById("tFill").style.stroke = tLeft <= 8 ? "#e63946" : tLeft <= 15 ? "#f0b429" : "var(--gold)";
+  // Countdown sounds
+  if (tLeft <= 5 && tLeft > 0) snd("countdown");
+  else if (tLeft <= 10 && tLeft > 5) snd("tick");
+}
+
+function timeUp() {
+  answered = true; clearTs(); disableA(); hlCorrect();
+  snd("timeout");
+  showWaitBanner(false);
+  setTimeout(() => showResult(false), 1400);
+}
+
+// ══════════════════════════════════════
+//  ANSWER
+// ══════════════════════════════════════
+function pickAnswer(idx, btn) {
+  if (answered) return;
+  answered = true; clearTs(); disableA();
+  snd("click");
+  btn.classList.add("sel-wait");
+  // Show neutral countdown — no reveal yet
+  const wb = document.getElementById("wBanner");
+  wb.style.display = "flex";
+  wb.className = "wbanner wb-wait";
+  wb.innerHTML = `⏳ &nbsp;<span style="font-family:'Oxanium';font-size:2rem;font-weight:800;color:var(--gold)" id="wCount">${WAIT_S}</span>&nbsp; چرکە`;
+  document.getElementById("tFill").style.stroke = "#a78bfa";
+  let c = WAIT_S;
+  document.getElementById("tNum").textContent = c;
+  waitI = setInterval(() => {
+    c--;
+    document.getElementById("tNum").textContent = c;
+    const wc = document.getElementById("wCount");
+    if (wc) wc.textContent = c;
+    if (c <= 0) {
+      clearInterval(waitI);
+      // NOW reveal
+      btn.classList.remove("sel-wait");
+      const ok = idx === curQ.correct;
+      btn.classList.add(ok ? "ok" : "sw");
+      if (!ok) hlCorrect();
+      snd(ok ? "correct" : "wrong");
+      showWaitBanner(ok);
+      setTimeout(() => showResult(ok), 1400);
+    }
+  }, 1000);
+}
+
+function showWaitBanner(ok) {
+  const wb = document.getElementById("wBanner");
+  wb.style.display = "flex";
+  wb.className = "wbanner " + (ok ? "wb-ok" : "wb-ng");
+  wb.innerHTML  = ok ? "✅ وەڵامی ڕاست!" : "❌ وەڵامی غەلەت!";
+}
+
+function hlCorrect() {
+  document.querySelectorAll(".ab").forEach(b => {
+    if (parseInt(b.dataset.idx) === curQ.correct) b.classList.add("ok");
+  });
+}
+function disableA() { document.querySelectorAll(".ab").forEach(b => b.disabled = true); }
+
+function useLifeline() {
+  powerups[turnIdx].lifeline = false; renderPuBar();
+  const wrong = [...document.querySelectorAll(".ab")]
+    .filter(b => !b.disabled && parseInt(b.dataset.idx) !== curQ.correct);
+  wrong.sort(() => Math.random() - .5).slice(0, 2)
+    .forEach(b => { b.classList.add("gone"); b.disabled = true; });
+  notif("٥٠/٥٠ بەکارهات ✓", "mrk");
+}
+
+// ══════════════════════════════════════
+//  SHOW RESULT
+// ══════════════════════════════════════
+function showResult(ok) {
+  const eff      = effects[turnIdx];
+  const isSteal  = eff.stealBy !== null;
+  const isCursed = eff.curseBy !== null;
+  const pts      = powerups[turnIdx].double ? 100 : 50;
+  let extraMsg   = "";
+
+  if (ok) {
+    scores[turnIdx] += pts;
+    // steal + correct = nothing happens
+  } else {
+    // steal + wrong = victim loses 30, buyer gains 30
+    if (isSteal) {
+      const amt = Math.min(30, scores[turnIdx]);
+      scores[turnIdx]       = Math.max(0, scores[turnIdx] - amt);
+      scores[eff.stealBy]  += amt;
+      extraMsg = "💰 " + players[eff.stealBy].name + " " + amt + " خاڵی برد!";
+    }
+    // curse + wrong = nothing (only 15s was the punishment)
+  }
+
+  // consume
+  powerups[turnIdx].double   = false;
+  powerups[turnIdx].lifeline = false;
+  effects[turnIdx]           = { stealBy: null, curseBy: null };
+
+  // UI overlay
+  document.getElementById("ri").textContent  = ok ? "✅" : "❌";
+  document.getElementById("rt").textContent  = ok ? "وەڵامی ڕاست!" : "وەڵامی غەلەت!";
+  document.getElementById("rp").textContent  = ok ? "+" + pts + " خاڵ" : "+٠ خاڵ";
+  document.getElementById("rb").className    = "rb " + (ok ? "ok-b" : "ng-b");
+  const re = document.getElementById("re");
+  if (extraMsg) { re.style.display = "block"; re.textContent = extraMsg; }
+  else            re.style.display = "none";
+  if (ok) confetti();
+  document.getElementById("ro").classList.add("show");
+
+  setTimeout(() => {
+    document.getElementById("ro").classList.remove("show");
+    markUsed(curCat, curLvl);
+    turnIdx = (turnIdx + 1) % players.length;
+    back2cats();
+  }, 2400);
+}
+
+function markUsed(c, l) { if (!usedLvl[c]) usedLvl[c] = new Set(); usedLvl[c].add(l); }
+function back2cats()    { updateSBar(); renderCats(); go("s-cats"); }
+
+// ══════════════════════════════════════
+//  MARKET
+// ══════════════════════════════════════
+function renderMarket() {
+  const p = players[turnIdx];
+  document.getElementById("mktName").textContent  = p.emoji + " " + p.name;
+  document.getElementById("mktScore").textContent = scores[turnIdx];
+  const grid = document.getElementById("mktGrid"); grid.innerHTML = "";
+  SHOP.forEach(item => {
+    let owned = false;
+    if (item.target) {
+      owned = players.some((_, vi) => vi !== turnIdx &&
+        ((item.id === "steal" && effects[vi].stealBy === turnIdx) ||
+         (item.id === "curse" && effects[vi].curseBy === turnIdx)));
+    } else {
+      owned = !!powerups[turnIdx][item.id];
+    }
+    const cant = scores[turnIdx] < item.price || owned;
+    const d = document.createElement("div");
+    d.className = "mcard " + item.cls + (cant ? " cant" : "") + (owned ? " owned" : "");
+    d.innerHTML = `<span class="mc-i">${item.icon}</span>
+      <div class="mc-n" style="color:${item.color}">${item.name}</div>
+      <div class="mc-d">${item.desc}</div>
+      <div class="mc-p" style="color:${item.color}">${owned ? "✅ کڕاوە" : item.price + " خاڵ"}</div>`;
+    if (!cant) d.onclick = () => buyItem(item);
+    grid.appendChild(d);
+  });
+}
+
+function buyItem(item) {
+  if (scores[turnIdx] < item.price) { notif("خاڵی تەمەن نییە", "err"); return; }
+  scores[turnIdx] -= item.price;
+  snd("buy"); updateSBar();
+  if (item.target) {
+    pending = { type: item.id, buyerIdx: turnIdx };
+    document.getElementById("tgtIcon").textContent  = item.tIcon;
+    document.getElementById("tgtTitle").textContent = item.tTitle;
+    document.getElementById("tgtDesc").textContent  = item.tDesc;
+    const list = document.getElementById("tgtList"); list.innerHTML = "";
+    players.forEach((p, i) => {
+      if (i === turnIdx) return;
+      const b = document.createElement("button");
+      b.className = "tbtn"; b.style.borderColor = p.color;
+      b.innerHTML = `<span>${p.emoji} ${p.name}</span>
+        <span style="font-family:'Oxanium';color:${p.color}">${scores[i]} خاڵ</span>`;
+      b.onclick = () => applyTarget(i);
+      list.appendChild(b);
+    });
+    go("s-target"); return;
+  }
+  powerups[turnIdx][item.id] = true;
+  notif("✅ کڕاوە — " + item.name, "mrk");
+  renderMarket();
+}
+
+function applyTarget(victimIdx) {
+  if (!pending) return;
+  const { type, buyerIdx } = pending; pending = null;
+  if (type === "steal") {
+    effects[victimIdx].stealBy = buyerIdx;
+    notif("💰 دزینی خاڵ لە " + players[victimIdx].name, "mrk");
+  } else if (type === "curse") {
+    effects[victimIdx].curseBy = buyerIdx;
+    notif("⚡ نەفرەت لە " + players[victimIdx].name, "crs");
+  }
+  updateSBar(); go("s-cats");
+}
+
+// ══════════════════════════════════════
+//  FINAL
+// ══════════════════════════════════════
+function showFinal() {
+  const sorted = players.map((p,i) => ({p,i,s:scores[i]})).sort((a,b) => b.s-a.s);
+  const medals = ["👑","🥈","🥉","4️⃣","5️⃣","6️⃣","7️⃣","8️⃣","9️⃣","🔟"];
+  const pod = document.getElementById("podium"); pod.innerHTML = "";
+  sorted.forEach(({p,s},rank) => {
+    const d = document.createElement("div");
+    d.className = "pc " + (rank===0 ? "win" : "los");
+    d.innerHTML = `<div class="crown">${medals[rank]||"—"}</div>
+      <div class="pname" style="color:${p.color}">${p.emoji} ${p.name}</div>
+      <div class="pscore">${s}</div><div class="plbl">خاڵ</div>`;
+    pod.appendChild(d);
+  });
+  if (sorted.length > 1 && sorted[0].s === sorted[1].s) {
+    const t = document.createElement("div");
+    t.style.cssText = "width:100%;text-align:center;color:var(--gold);font-weight:700;margin-top:10px";
+    t.textContent = "🤝 یەکسان!"; pod.appendChild(t);
+  } else confetti();
+  go("s-final");
+}
+
+// ══════════════════════════════════════
+//  CONFETTI
+// ══════════════════════════════════════
+function confetti() {
+  const em = ["🎉","⭐","🏆","✨","🎊","💫","🌟"];
+  for (let i = 0; i < 18; i++) setTimeout(() => {
+    const e = document.createElement("div"); e.className = "ce";
+    e.textContent = em[Math.floor(Math.random()*em.length)];
+    e.style.left  = Math.random()*100 + "vw";
+    e.style.animationDuration = (1.5+Math.random()*2) + "s";
+    document.body.appendChild(e);
+    e.addEventListener("animationend", () => e.remove());
+  }, i*70);
+}
+
+// ══════════════════════════════════════
+//  SOUND ENGINE
+// ══════════════════════════════════════
+// ══════════════════════════════════════
+//  SOUND ENGINE
+// ══════════════════════════════════════
+let AC = null;
+
+function getAC() {
+  if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)();
+  if (AC.state === "suspended") AC.resume();
+  return AC;
+}
+
+function snd(type) {
+  try {
+    const ac = getAC();
+    const t  = ac.currentTime;
+
+    if (type === "click") {
+      // Short soft tick
+      const o=ac.createOscillator(), g=ac.createGain();
+      o.connect(g); g.connect(ac.destination);
+      o.type = "sine";
+      o.frequency.setValueAtTime(600, t);
+      o.frequency.exponentialRampToValueAtTime(300, t+.1);
+      g.gain.setValueAtTime(.25, t);
+      g.gain.exponentialRampToValueAtTime(.001, t+.1);
+      o.start(t); o.stop(t+.1);
+
+    } else if (type === "correct") {
+      // Happy victory fanfare — 4 ascending notes
+      [[392,0,0.18],[523,.16,0.18],[659,.32,0.18],[784,.48,0.35],[1046,.65,0.5]]
+        .forEach(([freq, dt, dur]) => {
+          const o=ac.createOscillator(), g=ac.createGain();
+          o.type="sine"; o.connect(g); g.connect(ac.destination);
+          o.frequency.setValueAtTime(freq, t+dt);
+          g.gain.setValueAtTime(0, t+dt);
+          g.gain.linearRampToValueAtTime(.45, t+dt+.03);
+          g.gain.exponentialRampToValueAtTime(.001, t+dt+dur);
+          o.start(t+dt); o.stop(t+dt+dur+.05);
+        });
+      // Add a shimmer effect
+      const o2=ac.createOscillator(), g2=ac.createGain();
+      o2.type="sine"; o2.connect(g2); g2.connect(ac.destination);
+      o2.frequency.setValueAtTime(2000, t+.65);
+      o2.frequency.exponentialRampToValueAtTime(1500, t+1.1);
+      g2.gain.setValueAtTime(0, t+.65);
+      g2.gain.linearRampToValueAtTime(.2, t+.68);
+      g2.gain.exponentialRampToValueAtTime(.001, t+1.1);
+      o2.start(t+.65); o2.stop(t+1.15);
+
+    } else if (type === "wrong") {
+      // Sad descending buzzer
+      [[300,0,.25],[240,.2,.25],[180,.4,.4]].forEach(([freq,dt,dur]) => {
+        const o=ac.createOscillator(), g=ac.createGain();
+        o.type="sawtooth"; o.connect(g); g.connect(ac.destination);
+        o.frequency.setValueAtTime(freq, t+dt);
+        g.gain.setValueAtTime(0, t+dt);
+        g.gain.linearRampToValueAtTime(.3, t+dt+.03);
+        g.gain.exponentialRampToValueAtTime(.001, t+dt+dur);
+        o.start(t+dt); o.stop(t+dt+dur+.05);
+      });
+
+    } else if (type === "buy") {
+      // Cash register ding
+      [[1200,0,.15],[900,.14,.2],[1100,.3,.15]].forEach(([freq,dt,dur]) => {
+        const o=ac.createOscillator(), g=ac.createGain();
+        o.type="sine"; o.connect(g); g.connect(ac.destination);
+        o.frequency.setValueAtTime(freq, t+dt);
+        g.gain.setValueAtTime(0, t+dt);
+        g.gain.linearRampToValueAtTime(.4, t+dt+.02);
+        g.gain.exponentialRampToValueAtTime(.001, t+dt+dur);
+        o.start(t+dt); o.stop(t+dt+dur+.05);
+      });
+
+    } else if (type === "tick") {
+      // Timer tick (for countdown)
+      const o=ac.createOscillator(), g=ac.createGain();
+      o.type="square"; o.connect(g); g.connect(ac.destination);
+      o.frequency.setValueAtTime(880, t);
+      g.gain.setValueAtTime(.08, t);
+      g.gain.exponentialRampToValueAtTime(.001, t+.04);
+      o.start(t); o.stop(t+.04);
+
+    } else if (type === "timeout") {
+      // Time up alarm
+      [[440,0,.1],[440,.15,.1],[440,.3,.1],[330,.5,.4]].forEach(([freq,dt,dur]) => {
+        const o=ac.createOscillator(), g=ac.createGain();
+        o.type="square"; o.connect(g); g.connect(ac.destination);
+        o.frequency.setValueAtTime(freq, t+dt);
+        g.gain.setValueAtTime(0, t+dt);
+        g.gain.linearRampToValueAtTime(.35, t+dt+.02);
+        g.gain.exponentialRampToValueAtTime(.001, t+dt+dur);
+        o.start(t+dt); o.stop(t+dt+dur+.05);
+      });
+
+    } else if (type === "countdown") {
+      // Last 5 seconds urgent beep
+      const o=ac.createOscillator(), g=ac.createGain();
+      o.type="sine"; o.connect(g); g.connect(ac.destination);
+      o.frequency.setValueAtTime(660, t);
+      g.gain.setValueAtTime(.2, t);
+      g.gain.exponentialRampToValueAtTime(.001, t+.08);
+      o.start(t); o.stop(t+.1);
+    }
+  } catch(e) { console.warn("Sound error:", e); }
+}
+
+// Unlock on first touch/click
+function unlockAC() { getAC(); }
+document.addEventListener("click",     unlockAC, {once:true});
+document.addEventListener("touchstart", unlockAC, {once:true});
+
+// ══════════════════════════════════════
+//  ADMIN
+// ══════════════════════════════════════
+function checkPw() {
+  if (document.getElementById("aPw").value === ADMIN_PW) {
+    document.getElementById("aPw").value = "";
+    document.getElementById("adminSrc").textContent = fbOK ? "🟢 Firebase" : "⚠️ localStorage";
+    adminRenderList(); go("s-admin");
+  } else notif("وشەی نهێنی غەلەتە!", "err");
+}
+
+function pickCr(idx) {
+  selCr = idx;
+  for (let i = 0; i < 4; i++) document.getElementById("cr"+i).classList.toggle("on", i===idx);
+}
+
+async function adminSave() {
+  const catId    = document.getElementById("aCat").value;
+  const level    = document.getElementById("aLvl").value.trim().toUpperCase();
+  const question = document.getElementById("aQ").value.trim();
+  const answers  = ["a0","a1","a2","a3"].map(id => document.getElementById(id).value.trim());
+  if (!catId)                   { notif("پۆلێک هەڵبژێرە","err"); return; }
+  if (!level)                   { notif("ئاستێک بنووسە","err"); return; }
+  if (!question)                { notif("پرسیار بنووسە","err"); return; }
+  if (!answers[0]||!answers[1]) { notif("لانیکەم دوو وەڵام","err"); return; }
+  if (selCr < 0)                { notif("وەڵامی ڕاست دیاری بکە","err"); return; }
+  if (!answers[selCr])          { notif("وەڵامی ڕاستەکەت بەتاڵە","err"); return; }
+
+  const btn = document.getElementById("saveBtn");
+  btn.textContent = "⏳ پارازتن..."; btn.disabled = true;
+
+  if (!allQ[catId])        allQ[catId]        = {};
+  if (!allQ[catId][level]) allQ[catId][level] = [];
+  allQ[catId][level].push({ question, answers, correct: selCr });
+
+  let saved = false;
+  if (fbOK) {
+    try {
+      await fbSaveQ(catId, level, allQ[catId][level]);
+      saved = true;
+    } catch(e) {
+      console.error("Firebase save error:", e);
+    }
+  }
+  if (!saved) lsSave();
+
+  btn.textContent = "💾 پاراستن"; btn.disabled = false;
+
+  // clear form
+  document.getElementById("aLvl").value = "";
+  document.getElementById("aQ").value   = "";
+  ["a0","a1","a2","a3"].forEach(id => document.getElementById(id).value = "");
+  for (let i = 0; i < 4; i++) document.getElementById("cr"+i).classList.remove("on");
+  selCr = -1;
+
+  notif("✅ پرسیار پارازرا " + (saved ? "Firebase" : "localStorage"), "suc");
+  adminRenderList();
+}
+
+async function adminReload() {
+  setStatus("⏳ بارکردن...", "#f0b429");
+  try {
+    allQ = await fbLoadAll();
+    fbOK = true; lsSave();
+    setStatus("🟢 Firebase یەکگیراوە", "#06d6a0");
+    adminRenderList(); notif("نوێ کرایەوە ✓", "suc");
+  } catch(e) {
+    allQ = lsLoad();
+    setStatus("⚠️ localStorage", "#f97316");
+    adminRenderList(); notif("Firebase هەڵە — localStorage بەکاردەهێنم", "inf");
+  }
+}
+
+function adminRenderList() {
+  const list = document.getElementById("adminList"); list.innerHTML = "";
+  let total = 0;
+  CATS.forEach(cat => {
+    const cd = allQ[cat.id]; if (!cd) return;
+    Object.keys(cd).sort().forEach(level => {
+      const qs = toArr(cd[level]); if (!qs.length) return;
+      qs.forEach((qi, idx) => {
+        if (!qi || !qi.question) return; total++;
+        const d = document.createElement("div"); d.className = "qitem";
+        d.innerHTML = `
+          <div style="flex:1;min-width:0">
+            <span style="font-size:.73rem;color:var(--gold);font-weight:700;display:block;margin-bottom:2px">
+              ${cat.name} — ئاست ${level}</span>
+            <div style="font-size:.84rem;color:rgba(255,255,255,.7);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+              ${qi.question}</div>
+            <div style="font-size:.7rem;color:var(--muted);margin-top:2px">
+              وەڵامی ڕاست: ${["A","B","C","D"][qi.correct]} — ${qi.answers[qi.correct]||""}</div>
+          </div>
+          <button class="qdel" onclick="adminDel('${cat.id}','${level}',${idx})">🗑</button>`;
+        list.appendChild(d);
+      });
+    });
+  });
+  if (!total) list.innerHTML = `<p style="color:var(--muted);text-align:center;padding:16px 0">هێچ پرسیارێک نەپارازراوە</p>`;
+}
+
+async function adminDel(catId, lvl, idx) {
+  if (!confirm("دڵنیایت لە سڕینەوەی ئەم پرسیارە؟")) return;
+  toArr(allQ[catId]?.[lvl]).splice(idx, 1);
+  if (fbOK) {
+    try { await fbSaveQ(catId, lvl, allQ[catId][lvl]); }
+    catch(e) { console.error(e); }
+  }
+  lsSave();
+  notif("پرسیار سڕایەوە ✓", "suc"); adminRenderList();
+}
+
+// ══════════════════════════════════════
+//  NOTIFICATION
+// ══════════════════════════════════════
+function notif(msg, type) {
+  const el = document.getElementById("notif");
+  el.textContent = msg; el.className = "notif " + (type||"inf") + " show";
+  clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove("show"), 3200);
+}
+
+// ══════════════════════════════════════
+//  BOOT
+// ══════════════════════════════════════
+window.addEventListener("load", bootLoad);
 </script>
 </body>
 </html>
