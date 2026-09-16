@@ -641,6 +641,7 @@ let players  = [];
 let scores   = [];
 let powerups = []; // [{lifeline,double,time}]
 let effects  = []; // [{stealBy:null|idx, curseBy:null|idx}]
+let lastCat  = []; // [catId|null] — last category picked BY EACH PLAYER
 let turnIdx  = 0;
 let usedLvl  = {};
 let curCat   = null, curLvl = null, curQ = null;
@@ -713,6 +714,7 @@ function startGame() {
   scores   = players.map(() => 0);
   powerups = players.map(() => ({ lifeline:false, double:false, time:false }));
   effects  = players.map(() => ({ stealBy:null, curseBy:null }));
+  lastCat  = players.map(() => null);
   usedLvl  = {}; qUsage = {};
   turnIdx  = Math.floor(Math.random() * players.length);
   document.getElementById("fName").textContent = players[turnIdx].name;
@@ -768,12 +770,18 @@ function renderCats() {
     const avail   = getLevels(cat.id);
     const usedSet = usedLvl[cat.id] || new Set();
     const remain  = avail.filter(l => !usedSet.has(l));
+    // Per-player rule: current player can't repeat the category they picked last turn.
+    const blockedForPlayer = lastCat[turnIdx] === cat.id;
     const btn = document.createElement("button");
-    btn.className = "cbtn" + (remain.length === 0 ? " dis" : "");
+    btn.className = "cbtn" + ((remain.length === 0 || blockedForPlayer) ? " dis" : "");
     let lh = avail.map(l => `<span class="lb ${usedSet.has(l)?"used":"avail"}">${l}</span>`).join("");
     if (!avail.length) lh = `<span style="font-size:.68rem;color:rgba(255,255,255,.25)">پرسیار نییە</span>`;
-    btn.innerHTML = `<span class="ci">${cat.icon}</span><span>${cat.name}</span><div class="cl">${lh}</div>`;
-    if (remain.length > 0) btn.onclick = () => openLP(cat.id);
+    let lockNote = "";
+    if (blockedForPlayer && remain.length > 0) {
+      lockNote = `<div style="font-size:.62rem;color:var(--red);margin-top:4px">✖️ دووبارە نابێت</div>`;
+    }
+    btn.innerHTML = `<span class="ci">${cat.icon}</span><span>${cat.name}</span><div class="cl">${lh}</div>${lockNote}`;
+    if (remain.length > 0 && !blockedForPlayer) btn.onclick = () => openLP(cat.id);
     grid.appendChild(btn);
   });
   const withQ = CATS.filter(c => getLevels(c.id).length > 0);
@@ -788,6 +796,7 @@ function renderCats() {
 // ══════════════════════════════════════
 function openLP(catId) {
   curCat = catId;
+  lastCat[turnIdx] = catId; // remember this player's pick for next time it's their turn
   const cat     = CATS.find(c => c.id === catId);
   const avail   = getLevels(catId);
   const usedSet = usedLvl[catId] || new Set();
@@ -1111,9 +1120,6 @@ function confetti() {
   }, i*70);
 }
 
-// ══════════════════════════════════════
-//  SOUND ENGINE
-// ══════════════════════════════════════
 // ══════════════════════════════════════
 //  SOUND ENGINE
 // ══════════════════════════════════════
